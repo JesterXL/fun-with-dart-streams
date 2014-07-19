@@ -71,14 +71,19 @@ class BattleTimer
 	{
 		if (_gameLoopStreamSubscription == null) {
 			_gameLoopStreamSubscription = _gameLoopStream
-//			.where((GameLoopEvent event)
-//			{
-//				return event.type == GameLoopEvent.TICK;
-//			})
+			.where((GameLoopEvent event)
+			{
+				return event.type == GameLoopEvent.TICK;
+			})
+			.handleError((Error error)
+			{
+				print("BattleTimer, startListenToGameLoop, error: " + error.toString());
+			})
 			.listen((GameLoopEvent event)
 			{
 				tick(event.time);
 			});
+			
 		}
 	}
 
@@ -128,12 +133,11 @@ class BattleTimer
 			return;
 		}
 
-		lastTick += time;
-		num last = lastTick + time;
-		num result = last / TIME_SLICE;
-		int resultInt = (last / TIME_SLICE).floor();
+		lastTick = lastTick + time.round();
+		num result = lastTick / TIME_SLICE;
+		int resultInt = (lastTick / TIME_SLICE).floor();
 		if (result > 0) {
-			num remainder = last - (result * TIME_SLICE);
+			num remainder = lastTick - (result * TIME_SLICE);
 			lastTick = remainder;
 			// TODO: if someone pauses this while running modeFunc
 			// we should respect this... this should be a Stream
@@ -142,13 +146,21 @@ class BattleTimer
 				modeFunc();
 				result--;
 			}
-			_streamController.add(new BattleTimerEvent(BattleTimerEvent.PROGRESS, this));
+			num percentage = gauge / MAX;
+//			print("gauge: $gauge, MAX: $MAX, percentage: $percentage");
+//			print("---percentage: $percentage");
+			if(percentage == null)
+			{
+				throw "This can't be null home slice dice mice thrice lice kites... kites doesn't rhyme.";
+			}
+			_streamController.add(new BattleTimerEvent(BattleTimerEvent.PROGRESS, this, percentage: percentage));
 		}
 	}
 
 	void onCharacterTick()
 	{
-		gauge += ((effect * (speed + 20)) / 16);
+		num result = (((effect * (speed + 20)) / 16));
+		gauge += result.round();
 		// dispatch progress = gauge / MAX;
 		if (gauge >= MAX) {
 			// dispatch complete

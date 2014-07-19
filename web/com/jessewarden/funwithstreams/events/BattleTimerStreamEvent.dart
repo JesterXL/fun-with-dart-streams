@@ -10,8 +10,10 @@ class BattleTimerEvent
 	
 	String type;
 	BattleTimer target;
+	num percentage;
 	
-	BattleTimerEvent(this.type, this.target)
+	BattleTimerEvent(this.type, this.target, {num percentage: null})
 	{
+		this.percentage = percentage;
 	}
 }

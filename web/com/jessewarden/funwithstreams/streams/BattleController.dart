@@ -2,118 +2,16 @@ part of funwithstreamslib;
 
 class BattleController
 {
-	Stream<GameLoopEvent> _gameLoopStream;
-	List charactersReady = new List();
-	List<Player> players = new List<Player>();
-	List<Monster> monsters = new List<Monster>();
-	Map<BattleTimer, Character> battleTimers = new Map<BattleTimer, Character>();
+	Initiative initiative;
 	Map battleResults = new Map();
 	bool battleOver = false;
 	StreamController<BattleControllerEvent> _streamController;
     Stream<BattleControllerEvent> battleStream;
 	
-	BattleController(this._gameLoopStream, this.players, this.monsters)
+	BattleController()
 	{
-		init();
 	}
 	
-	void init()
-	{
-		_streamController = new StreamController<BattleControllerEvent>(onPause: onPause,
-        																onResume: onResume);
-		battleStream = _streamController.stream.asBroadcastStream();
-		
-		BattleTimer timer;
-		players.forEach((Player player)
-		{
-			timer = new BattleTimer(_gameLoopStream, BattleTimer.MODE_CHARACTER);
-			timer.stream.where((BattleTimerEvent event)
-			{
-				return event.type == BattleTimerEvent.COMPLETE;
-			})
-			.listen((BattleTimerEvent event)
-			{
-				onCharacterReady(battleTimers[event.target]);
-			});
-			timer.speed = player.speed;
-			
-			player.hitPointsStream.listen((CharacterEvent event)
-			{
-				if(event.target.hitPoints <= 0)
-        		{
-        			onDeath(event.target);
-        		}
-			});
-			
-			battleTimers[timer] = player;
-		});
-		
-		monsters.forEach((Monster monster)
-		{
-			timer = new BattleTimer(_gameLoopStream, BattleTimer.MODE_MONSTER);
-			timer.stream.where((BattleTimerEvent event)
-			{
-				return event.type == BattleTimerEvent.COMPLETE;
-			})
-			.listen((BattleTimerEvent event)
-			{
-				onCharacterReady(battleTimers[event.target]);
-			});
-			timer.speed = monster.speed;
-			
-			monster.strength = BattleUtils.getRandomMonsterStrength();
-			monster.hitPointsStream.listen((CharacterEvent event)
-			{
-				if(event.target.hitPoints <= 0)
-				{
-					onDeath(event.target);
-				}
-			});
-			
-			battleTimers[timer] = monster;
-		});
-	}
-	
-	void onPause()
-	{
-		pause();
-	}
-	
-	void onResume()
-	{
-		resume();
-	}
-	
-	bool start()
-	{
-		if(battleOver)
-		{
-			return false;
-		}
-		
-		battleTimers.forEach((BattleTimer timer, Character character)
-		{
-			timer.reset();
-			timer.start();
-		});
-		return true;
-	}
-	
-	void pause()
-	{
-		battleTimers.forEach((BattleTimer timer, Character character)
-		{
-			timer.pause();
-		});
-	}
-	
-	void resume()
-	{
-		battleTimers.forEach((BattleTimer timer, Character character)
-		{
-			timer.start();
-		});
-	}
 	
 	bool resolveActionResult(dynamic actionResult)
 	{
@@ -471,38 +369,5 @@ class BattleController
 		}
 	}
 	
-	void onDeath(Character character)
-	{
-		BattleTimer characterTimer = battleTimers.keys.firstWhere((BattleTimer timer)
-		{
-			return battleTimers[timer] == character;
-		});
-		characterTimer.pause();
-		bool allMonstersDead = monsters.every((Monster monster)
-		{
-			return monster.dead;
-		});
-		
-		bool allPlayersDead = players.every((Player player)
-		{
-			return player.dead;
-		});
-		
-		// TODO: handle Life 3
-		if(allPlayersDead)
-		{
-			pause();
-			battleOver = true;
-			_streamController.add(new BattleControllerEvent(BattleControllerEvent.LOST, this));
-			return;
-		}
-		
-		if(allMonstersDead)
-		{
-			pause();
-			battleOver = true;
-			_streamController.add(new BattleControllerEvent(BattleControllerEvent.WON, this));
-            return;
-		}
-	}
+	
 }

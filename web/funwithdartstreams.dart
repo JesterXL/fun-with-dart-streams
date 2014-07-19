@@ -1,6 +1,8 @@
 import 'dart:core';
 import 'dart:async';
+import 'dart:html' as html;
 import 'com/jessewarden/funwithstreams/funwithstreamslib.dart';
+import 'package:stagexl/stagexl.dart';
 
 void main()
 {
@@ -15,6 +17,33 @@ void main()
 //	testAsyncListen();
 //	testFuture();
 //	testFutureStream();
+	testInitiative();
+}
+
+void testInitiative()
+{
+	// setup the Stage and RenderLoop
+	var canvas = html.querySelector('#stage');
+	var stage = new Stage(canvas);
+	var renderLoop = new RenderLoop();
+	renderLoop.addStage(stage);
+	
+	InitiativeBar bar = new InitiativeBar();
+	stage.addChild(bar);
+	
+	GameLoop gameLoop = new GameLoop();
+	BattleTimer timer = new BattleTimer(gameLoop.stream, BattleTimer.MODE_CHARACTER);
+	gameLoop.start();
+	timer.start();
+	timer.stream
+	.where((BattleTimerEvent event)
+	{
+		return event.type == BattleTimerEvent.PROGRESS;
+	})
+	.listen((BattleTimerEvent event)
+	{
+		bar.percentage = event.percentage;
+	});
 }
 
 

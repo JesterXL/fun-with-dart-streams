@@ -2,5 +2,5 @@ name: funwithdartstreams
 author: Jesse Warden
 description: Having fun with Dart streams.
 dependencies:
-  bootjack: any
   browser: any
+  stagexl: any
