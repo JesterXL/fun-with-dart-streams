@@ -5,6 +5,7 @@ import 'dart:math';
 import 'dart:core';
 import 'dart:async';
 import 'package:stagexl/stagexl.dart';
+import 'package:observe/observe.dart';
 
 part "Ticker.dart";
 part 'streams/GameLoop.dart';
@@ -25,5 +26,10 @@ part 'enums/Attack.dart';
 part "HitResult.dart";
 part "streams/Initiative.dart";
 part "events/InitiativeEvent.dart";
+part "vos/TargetHitResult.dart";
 
-part "components/InitiativeBar.dart";
+part "components/BattleTimerBar.dart";
+part "components/CharacterList.dart";
+
+part "sprites/SpriteSheet.dart";
+part "sprites/LockeSprite.dart";

@@ -1,6 +1,6 @@
 part of funwithstreamslib;
 
-class InitiativeBar extends DisplayObjectContainer
+class BattleTimerBar extends DisplayObjectContainer
 {
 	Shape bar;
 	Shape green;
@@ -20,7 +20,7 @@ class InitiativeBar extends DisplayObjectContainer
 		percentageDirty = true;
 	}
 	
-	InitiativeBar()
+	BattleTimerBar()
 	{
 		init();
 	}

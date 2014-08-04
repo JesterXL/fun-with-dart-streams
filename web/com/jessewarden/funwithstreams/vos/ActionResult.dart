@@ -5,16 +5,14 @@ class ActionResult
 	Character attacker;
 	List<Character> targets;
 	String attackType;
-	bool hit;
-	bool criticalHit;
-	List<int> damages;
+	List<TargetHitResult> targetHitResults;
 	
-	ActionResult(this.attacker,
-					this.targets,
-					this.attackType,
-					this.hit,
-					this.criticalHit,
-					this.damages)
+	ActionResult({
+		Character this.attacker,
+		List<Character> this.targets,
+		String this.attackType,
+		List<TargetHitResult> this.targetHitResults
+	})
 	{
 	}
 }

@@ -156,13 +156,21 @@ class BattleTimer
 			_streamController.add(new BattleTimerEvent(BattleTimerEvent.PROGRESS, this, percentage: percentage));
 		}
 	}
+	
+	void dispose()
+	{
+		running = false;
+		stopListenToGameLoop();
+	}
 
 	void onCharacterTick()
 	{
+//		print("BattleTimer::onCharacterTick, effect: $effect, speed: $speed");
 		num result = (((effect * (speed + 20)) / 16));
 		gauge += result.round();
 		// dispatch progress = gauge / MAX;
-		if (gauge >= MAX) {
+		if (gauge >= MAX)
+		{
 			// dispatch complete
 			gauge = 0;
 			_streamController.add(new BattleTimerEvent(BattleTimerEvent.COMPLETE, this));
