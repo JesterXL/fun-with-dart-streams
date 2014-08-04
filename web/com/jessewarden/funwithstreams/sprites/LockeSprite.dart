@@ -25,20 +25,31 @@ class LockeSprite extends SpriteSheet
         castingWest.add("locke_25");
         castingWest.add("locke_29");
         cycles["castingWest"] = castingWest;
-        
-        resourceManager.load()
-       	   .then((_) => init())
-       	   .catchError((e) => print(e));
 	}
 	
-	void init()
+	Future init()
 	{
-		_textureAtlas = resourceManager.getTextureAtlas('locke');
-		idle();
+		return new Future(()
+		{
+        	return resourceManager.load()
+		       	   .then((_)
+				   {
+		        		print("init time: " + new DateTime.now().toString());
+		        		_textureAtlas = resourceManager.getTextureAtlas('locke');
+		        		idleWest();
+				   })
+		       	   .catchError((e) => print(e));
+		});
 	}
 	
-	void idle()
+	void idleWest()
 	{
 		currentCycle = cycles["idleWest"];
+	}
+	
+	void castingWest()
+	{
+		print("castingWest time: " + new DateTime.now().toString());
+		currentCycle = cycles["castingWest"];
 	}
 }

@@ -40,8 +40,20 @@ void testingLockeSprite()
 	
 	 renderLoop.addStage(stage);
 	 
+	 LockeSprite locke = new LockeSprite(resourceManager);
 	 resourceManager.load()
-	   .then((_) => stage.addChild(new LockeSprite(resourceManager)))
+	   .then((_)
+	   {
+ 			stage.addChild(locke);
+ 			return locke.init();
+	   })
+	   .then((_)
+	   {
+			return new Future.delayed(new Duration(seconds: 1), ()
+			{
+				locke.castingWest();
+			});
+	   })
 	   .catchError((e) => print(e));
 }
 

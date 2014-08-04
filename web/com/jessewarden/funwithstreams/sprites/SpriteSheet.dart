@@ -16,6 +16,7 @@ abstract class SpriteSheet extends DisplayObjectContainer
 	List<String> get currentCycle => _currentCycle;
 	void set currentCycle(List<String> newCycle)
 	{
+		print("newCycle: $newCycle");
 		if(_currentCycle != newCycle)
 		{
 			_currentCycle = newCycle;
@@ -37,21 +38,6 @@ abstract class SpriteSheet extends DisplayObjectContainer
 	{
 		_bitmap = new Bitmap();
         addChild(_bitmap);
-	}
-	
-	void idle()
-	{
-		
-	}
-	
-	void attack()
-	{
-		
-	}
-	
-	void casting()
-	{
-		
 	}
 	
 	void render(RenderState renderState)
