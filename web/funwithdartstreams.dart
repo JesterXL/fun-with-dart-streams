@@ -4,7 +4,6 @@ import 'dart:html' as html;
 import 'com/jessewarden/funwithstreams/funwithstreamslib.dart';
 import 'package:observe/observe.dart';
 import 'package:stagexl/stagexl.dart';
-import 'tpdemo.dart';
 
 void main()
 {
@@ -28,8 +27,7 @@ void main()
 //	testActionResult();
 	
 //	testInitiative();
-//	testTexturePacker();
-	testingLockeSprite();
+//	testingLockeSprite();
 }
 
 void testingLockeSprite()
@@ -42,36 +40,19 @@ void testingLockeSprite()
 	 
 	 LockeSprite locke = new LockeSprite(resourceManager);
 	 resourceManager.load()
-	   .then((_)
-	   {
- 			stage.addChild(locke);
- 			return locke.init();
-	   })
-	   .then((_)
-	   {
+		.then((_)
+		{
+			stage.addChild(locke);
+			return locke.init();
+		})
+		.then((_)
+		{
 			return new Future.delayed(new Duration(seconds: 1), ()
 			{
 				locke.castingWest();
 			});
-	   })
-	   .catchError((e) => print(e));
-}
-
-
-void testTexturePacker()
-{
-	Stage stage = new Stage(html.querySelector('#stage'), webGL: true);
-    RenderLoop renderLoop = new RenderLoop();
-    ResourceManager resourceManager = new ResourceManager();
-    
-	 renderLoop.addStage(stage);
-     
-     resourceManager = new ResourceManager()
-       ..addTextureAtlas('locke', '../design/spritesheets/texturepacker/locke.json', TextureAtlasFormat.JSONARRAY);
-     
-     resourceManager.load()
-       .then((_) => stage.addChild(new TexturePackerDemo(resourceManager, stage)))
-       .catchError((e) => print(e));
+		})
+		.catchError((e) => print(e));
 }
 
 void testInitiative()
