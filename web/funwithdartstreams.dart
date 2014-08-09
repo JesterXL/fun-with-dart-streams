@@ -38,6 +38,7 @@ void testCharacterList()
 	
 }
 
+
 void testingLockeSprite()
 {
 	Stage stage = new Stage(html.querySelector('#stage'), webGL: true);
@@ -48,8 +49,11 @@ void testingLockeSprite()
 	ResourceManager resourceManager = new ResourceManager();
 	
 	 renderLoop.addStage(stage);
+	 Juggler juggler = renderLoop.juggler;
 	 
 	 LockeSprite locke = new LockeSprite(resourceManager);
+	 locke.x = 100;
+	 locke.y = 50;
 	 resourceManager.load()
 		.then((_)
 		{
@@ -75,6 +79,13 @@ void testingLockeSprite()
 			return new Future.delayed(new Duration(seconds: 1), ()
 			{
 				locke.attackWest();
+				
+				var ac = new AnimationChain();
+                ac.add(new Tween(locke, 0.5, TransitionFunction.linear)..animate.x.to(20));
+                ac.add(new Tween(locke, 0.5, TransitionFunction.linear)..animate.x.to(100));
+                juggler.add(ac);
+                
+               
 			});
 		})
 		.then((_)
