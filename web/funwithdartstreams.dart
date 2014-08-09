@@ -12,6 +12,7 @@ void main()
 //	testBattleUtilsGetRandomNumber();
 //	testGameLoopPauseResume();
 //	testGameLoopStreams();
+//	testPipe();
 	
 //	testAsyncExpand();
 //	testPipe();
@@ -27,12 +28,22 @@ void main()
 //	testActionResult();
 	
 //	testInitiative();
-//	testingLockeSprite();
+	testingLockeSprite();
+//	testCharacterList();
+}
+
+void testCharacterList()
+{
+	CharacterList characterList = new CharacterList();
+	
 }
 
 void testingLockeSprite()
 {
 	Stage stage = new Stage(html.querySelector('#stage'), webGL: true);
+    stage.scaleMode = StageScaleMode.SHOW_ALL;
+    stage.align = StageAlign.NONE;
+    
 	RenderLoop renderLoop = new RenderLoop();
 	ResourceManager resourceManager = new ResourceManager();
 	
@@ -50,6 +61,27 @@ void testingLockeSprite()
 			return new Future.delayed(new Duration(seconds: 1), ()
 			{
 				locke.castingWest();
+			});
+		})
+		.then((_)
+		{
+			return new Future.delayed(new Duration(seconds: 1), ()
+			{
+				locke.castSpellWest();
+			});
+		})
+		.then((_)
+		{
+			return new Future.delayed(new Duration(seconds: 1), ()
+			{
+				locke.attackWest();
+			});
+		})
+		.then((_)
+		{
+			return new Future.delayed(new Duration(seconds: 1), ()
+			{
+				locke.idleWest();
 			});
 		})
 		.catchError((e) => print(e));
@@ -71,16 +103,19 @@ void testInitiative()
 	monsters.add(new Monster());
 	
 	Initiative initiative = new Initiative(loop.stream, players, monsters);
-	initiative.stream.listen((InitiativeEvent event)
+	initiative.init()
+	.then((_)
 	{
-		print("event type: " + event.type.toString());
-	}).onError((error)
-	{
-		print("error: $error");
-		loop.pause();
+		print("then...");
+		initiative.stream.listen((InitiativeEvent event)
+    	{
+    		print("event type: " + event.type.toString());
+    	}).onError((error)
+    	{
+    		print("error: $error");
+    		loop.pause();
+    	});
 	});
-	
-	
 }
 
 void testActionResult()
@@ -219,10 +254,28 @@ void testBattleTimer()
 	});
 }
 
+class TestSink extends EventSink
+{
+	EventSink _outputSink;
+	TestSink(this._outputSink);
+	
+	void add(data)
+	{
+		_outputSink.add(data);
+	}
+	
+	void addError(e, [st]) => _outputSink.addError(e, st);
+	void close() => _outputSink.close();
+}
+
+// Stream.periodic(Duration period, [Function T computation(int computationCount)])
+
 void testFutureStream()
 {
 	Future mine = new Future.value(3);
-	var stream = new Stream.fromFuture(mine);
+	Future list = new Future.value([1, 2, 3]);
+	Stream stream = new Stream.fromFuture(mine).asBroadcastStream();
+	Stream listStream = new Stream.fromFuture(list).asBroadcastStream();
 	stream.listen((value)
 	{
 		print("value: $value");
@@ -286,7 +339,14 @@ void testPipe()
 		controller1.add("moo");
 	});
 	
-	
+	/*
+	Stream stream = new Stream.fromIterable([1, 2, 3]).asBroadcastStream();
+	StreamController con = new StreamController.broadcast();
+	stream.pipe(con).then((_)
+	{
+		print("pipe is done?");
+	});
+	*/
 	
 }
 

@@ -3,10 +3,9 @@ part of funwithstreamslib;
 class CharacterList extends DisplayObjectContainer
 {
 	
-	GameLoop gameLoop;
 	Initiative initiative;
 	
-	CharacterList(this.gameLoop, this.initiative)
+	CharacterList(this.initiative)
 	{
 		init();
 	}

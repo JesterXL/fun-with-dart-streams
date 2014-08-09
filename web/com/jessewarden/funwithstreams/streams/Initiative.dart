@@ -17,30 +17,50 @@ class Initiative
     	
 	Initiative(this._gameLoopStream, this._players, this._monsters)
 	{
-		init();
 	}
 	
-	void init()
+	Future init()
 	{
-		_streamController = new StreamController<InitiativeEvent>(onPause: onPause,
-        															onResume: onResume);
-		stream = _streamController.stream.asBroadcastStream();
-		List participants = new List();
-		participants.add(players);
-		participants.add(monsters);
-		participants.forEach((ObservableList list)
+		return new Future(()
 		{
-			// listen for new changes
-			list.listChanges.listen((List<ListChangeRecord> records)
+			_streamController = new StreamController<InitiativeEvent>(onPause: onPause,
+        															onResume: onResume);
+			return new Future(()
 			{
-				addOrRemoveBattleTimerForCharacter(records, list);
+				print("fixin to add stream...");
+				// TODO/FIXME: I think I want pipe, not addStream since it's not a true merge;
+				// this'll never actually complete the future because the GameLoop continues to add events...
+				//_streamController.addStream(_gameLoopStream)
+				
+				// TODO: HOW THE FUCK DO YOU MERGE STREAMS, OMG
+				return _gameLoopStream.takeWhile(()
+				{
+					return true;
+				})
+				.then((_)
+				{
+					print("added stream, making a new broadcast one...");
+					stream = _streamController.stream.asBroadcastStream();
+	    			List participants = new List();
+	    			participants.add(players);
+	    			participants.add(monsters);
+	    			participants.forEach((ObservableList list)
+	    			{
+	    				// listen for new changes
+	    				list.listChanges.listen((List<ListChangeRecord> records)
+	    				{
+	    					addOrRemoveBattleTimerForCharacter(records, list);
+	    				});
+	    				
+	    				// configure the participants in the battle we have now
+	    				list.forEach(addBattleTimerForCharacter);
+	    			});
+	    			
+	    			_streamController.add(new InitiativeEvent(InitiativeEvent.INITIALIZED));
+	    			return true;
+				});
 			});
-			
-			// configure the participants in the battle we have now
-			list.forEach(addBattleTimerForCharacter);
 		});
-		
-		_streamController.add(new InitiativeEvent(InitiativeEvent.INITIALIZED));
 	}
 	
 	void addBattleTimerForCharacter(Character character)

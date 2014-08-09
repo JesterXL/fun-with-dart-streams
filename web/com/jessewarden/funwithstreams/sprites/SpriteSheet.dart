@@ -16,7 +16,7 @@ abstract class SpriteSheet extends DisplayObjectContainer
 	List<String> get currentCycle => _currentCycle;
 	void set currentCycle(List<String> newCycle)
 	{
-		print("newCycle: $newCycle");
+//		print("newCycle: $newCycle");
 		if(_currentCycle != newCycle)
 		{
 			_currentCycle = newCycle;

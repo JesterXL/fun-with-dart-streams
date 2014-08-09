@@ -3,4 +3,6 @@ author: Jesse Warden
 description: Having fun with Dart streams.
 dependencies:
   browser: any
+  polymer: any
   stagexl: any
+  statemachine: any

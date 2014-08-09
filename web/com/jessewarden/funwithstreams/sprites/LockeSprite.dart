@@ -8,23 +8,32 @@ class LockeSprite extends SpriteSheet
 	{
 		this.resourceManager = resourceManager;
 		resourceManager.addTextureAtlas('locke', '../design/spritesheets/texturepacker/locke.json', TextureAtlasFormat.JSONARRAY);
-		
-        List<String> idleSouth = new List<String>();
-        idleSouth.add("locke_1");
-        cycles["idleSouth"] = idleSouth;
         
-        List<String> idleWest = new List<String>();
-        idleWest.add("locke_7");
-        cycles["idleWest"] = idleWest;
+        getAnimationList("idleSouth")
+        ..add("locke_1");
         
-        List<String> readyWest = new List<String>();
-        readyWest.add("locke_13");
-        cycles["readyWest"] = readyWest;
+        getAnimationList("idleWest")
+        ..add("locke_7");
         
-        List<String> castingWest = new List<String>();
-        castingWest.add("locke_25");
-        castingWest.add("locke_29");
-        cycles["castingWest"] = castingWest;
+        getAnimationList("readyWest")
+        ..add("locke_13");
+        
+        getAnimationList("castingWest")
+        ..add("locke_25")
+        ..add("locke_29");
+        
+        getAnimationList("castSpellWest")
+        ..add("locke_33");
+        
+        getAnimationList("attackWest")
+        ..add("locke_22");
+	}
+	
+	List<String> getAnimationList(String name)
+	{
+		List<String> list = new List<String>();
+		cycles[name] = list;
+		return list;
 	}
 	
 	Future init()
@@ -49,7 +58,17 @@ class LockeSprite extends SpriteSheet
 	
 	void castingWest()
 	{
-		print("castingWest time: " + new DateTime.now().toString());
+		frameTime = 0.2;
 		currentCycle = cycles["castingWest"];
+	}
+	
+	void castSpellWest()
+	{
+		currentCycle = cycles["castSpellWest"];
+	}
+	
+	void attackWest()
+	{
+		currentCycle = cycles["attackWest"];
 	}
 }
