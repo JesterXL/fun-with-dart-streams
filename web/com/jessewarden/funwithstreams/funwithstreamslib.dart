@@ -7,7 +7,6 @@ import 'dart:async';
 import 'package:stagexl/stagexl.dart';
 import 'package:observe/observe.dart';
 
-part "Ticker.dart";
 part 'streams/GameLoop.dart';
 part 'events/GameLoopEvent.dart';
 part 'enums/AttackTypes.dart';
@@ -20,8 +19,8 @@ part 'events/BattleControllerEvent.dart';
 part 'vos/ActionResult.dart';
 part 'vos/Character.dart';
 part 'events/CharacterEvent.dart';
-part "Monster.dart";
-part "Player.dart";
+part "vos/Monster.dart";
+part "vos/Player.dart";
 part 'enums/Attack.dart';
 part "HitResult.dart";
 part "streams/Initiative.dart";

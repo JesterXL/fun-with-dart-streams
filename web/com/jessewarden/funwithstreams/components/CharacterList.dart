@@ -12,23 +12,26 @@ class CharacterList extends DisplayObjectContainer
 	
 	void init()
 	{
+        
+		num startY = 0;
 		initiative.players.forEach((Player player)
 		{
 			BattleTimerBar bar = new BattleTimerBar();
 	    	addChild(bar);
+	    	bar.y = startY;
+	    	startY += 40;
 	    	
-//	    	BattleTimer timer = new BattleTimer(gameLoop.stream, BattleTimer.MODE_CHARACTER);
-//	    	gameLoop.start();
-//	    	timer.start();
-//	    	timer.stream
-//	    	.where((BattleTimerEvent event)
-//	    	{
-//	    		return event.type == BattleTimerEvent.PROGRESS;
-//	    	})
-//	    	.listen((BattleTimerEvent event)
-//	    	{
-//	    		bar.percentage = event.percentage;
-//	    	});
+	    	BattleTimer timer = new BattleTimer(initiative.gameLoopStream, BattleTimer.MODE_CHARACTER);
+        	timer.start();
+        	timer.stream
+        	.where((BattleTimerEvent event)
+        	{
+        		return event.type == BattleTimerEvent.PROGRESS;
+        	})
+        	.listen((BattleTimerEvent event)
+        	{
+        		bar.percentage = event.percentage;
+        	});
 		});
 		
 		initiative.stream.where((InitiativeEvent event)
@@ -37,13 +40,8 @@ class CharacterList extends DisplayObjectContainer
 		});
 	}
 	
-	void render(RenderState renderState)
-	{
-		super.render(renderState);
-//		if(percentageDirty)
-//		{
-//			percentageDirty = false;
-//			green.width = 100 * _percentage;
-//		}
-	}
+//	void render(RenderState renderState)
+//	{
+//		super.render(renderState);
+//	}
 }

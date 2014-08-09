@@ -3,9 +3,10 @@ part of funwithstreamslib;
 class Initiative
 {
 	Stream<GameLoopEvent> _gameLoopStream;
+	Stream<GameLoopEvent> get gameLoopStream => _gameLoopStream;
 	ObservableList<Player> _players;
 	ObservableList<Monster> _monsters;
-	List _battleTimers = new List();
+	List<TimerCharacterMap> _battleTimers = new List<TimerCharacterMap>();
     StreamController _streamController;
 	
 	ObservableList<Player> get players => _players;
@@ -17,50 +18,30 @@ class Initiative
     	
 	Initiative(this._gameLoopStream, this._players, this._monsters)
 	{
+		init();
 	}
 	
-	Future init()
+	void init()
 	{
-		return new Future(()
+		_streamController = new StreamController<InitiativeEvent>(onPause: onPause,
+                															onResume: onResume);
+		stream = _streamController.stream.asBroadcastStream();
+		List participants = new List();
+		participants.add(players);
+		participants.add(monsters);
+		participants.forEach((ObservableList list)
 		{
-			_streamController = new StreamController<InitiativeEvent>(onPause: onPause,
-        															onResume: onResume);
-			return new Future(()
+			// listen for new changes
+			list.listChanges.listen((List<ListChangeRecord> records)
 			{
-				print("fixin to add stream...");
-				// TODO/FIXME: I think I want pipe, not addStream since it's not a true merge;
-				// this'll never actually complete the future because the GameLoop continues to add events...
-				//_streamController.addStream(_gameLoopStream)
-				
-				// TODO: HOW THE FUCK DO YOU MERGE STREAMS, OMG
-				return _gameLoopStream.takeWhile(()
-				{
-					return true;
-				})
-				.then((_)
-				{
-					print("added stream, making a new broadcast one...");
-					stream = _streamController.stream.asBroadcastStream();
-	    			List participants = new List();
-	    			participants.add(players);
-	    			participants.add(monsters);
-	    			participants.forEach((ObservableList list)
-	    			{
-	    				// listen for new changes
-	    				list.listChanges.listen((List<ListChangeRecord> records)
-	    				{
-	    					addOrRemoveBattleTimerForCharacter(records, list);
-	    				});
-	    				
-	    				// configure the participants in the battle we have now
-	    				list.forEach(addBattleTimerForCharacter);
-	    			});
-	    			
-	    			_streamController.add(new InitiativeEvent(InitiativeEvent.INITIALIZED));
-	    			return true;
-				});
+				addOrRemoveBattleTimerForCharacter(records, list);
 			});
+			
+			// configure the participants in the battle we have now
+			list.forEach(addBattleTimerForCharacter);
 		});
+		
+		_streamController.add(new InitiativeEvent(InitiativeEvent.INITIALIZED));
 	}
 	
 	void addBattleTimerForCharacter(Character character)
@@ -69,19 +50,41 @@ class Initiative
 		BattleTimer timer = new BattleTimer(_gameLoopStream, mode);
 		StreamSubscription<BattleTimerEvent> timerSubscription = timer.stream.where((BattleTimerEvent event)
 		{
-			print("BattleTimer stream type: " + event.type.toString());
 			return event.type == BattleTimerEvent.COMPLETE;
 		})
 		.listen((BattleTimerEvent event)
 		{
-			var matched = _battleTimers.firstWhere((object)
+			try
 			{
-				object.timer == event.target;
-			});
-			Character targetCharacter = _battleTimers[matched].character;
-			charactersReady.add(targetCharacter);
-			_streamController.add(new InitiativeEvent(InitiativeEvent.CHARACTER_READY,
-														character: targetCharacter));
+				TimerCharacterMap matched = _battleTimers.firstWhere((TimerCharacterMap map)
+				{
+					try
+					{
+						if(map == null || map.battleTimer == null)
+						{
+							throw "Wait, what?";
+						}
+						else if(event == null || event.target == null)
+						{
+							throw "I don't even...";
+						}
+						return map.battleTimer == event.target;
+					}
+					catch(e)
+					{
+						print("error in firstWhere: $e");
+					}
+					return false;
+				});
+				Character targetCharacter = matched.character;
+				charactersReady.add(targetCharacter);
+				_streamController.add(new InitiativeEvent(InitiativeEvent.CHARACTER_READY,
+															character: targetCharacter));
+			}
+			catch(listenError)
+			{
+				print("error in listen: $listenError");
+			}
 		});
 		timer.speed = character.speed;
 		if(character is Monster)
@@ -102,13 +105,7 @@ class Initiative
     		}
 		});
 		
-		_battleTimers.add({
-							"battleTimer": timer,
-							"battleTimerSubscription": timerSubscription,
-							"character": character,
-							"characterSubscription": characterSubscription
-		});
-		
+		_battleTimers.add(new TimerCharacterMap(timer, timerSubscription, character, characterSubscription));
 		timer.start();
 	}
 	
@@ -126,12 +123,12 @@ class Initiative
 	
 	void removeBattleTimerForCharacter(Character character)
 	{
-		var object = _battleTimers.firstWhere((object) 
+		TimerCharacterMap object = _battleTimers.firstWhere((object) 
 		{
 			return object.character == character;
 		});
-		object.timer.dispose();
-		object.timerSubscription.cancel();
+		object.battleTimer.dispose();
+		object.battleTimerSubscription.cancel();
 		object.characterSubscription.cancel();
 		_battleTimers.remove(object);
 	}
@@ -157,9 +154,9 @@ class Initiative
 	
 	void reset()
 	{
-		_battleTimers.forEach((object)
+		_battleTimers.forEach((TimerCharacterMap object)
 		{
-			BattleTimer timer = object.timer;
+			BattleTimer timer = object.battleTimer;
 			timer.reset();
 			timer.start();
 		});
@@ -167,18 +164,18 @@ class Initiative
 	
 	void pause()
 	{
-		_battleTimers.forEach((object)
+		_battleTimers.forEach((TimerCharacterMap object)
 		{
-			BattleTimer timer = object.timer;
+			BattleTimer timer = object.battleTimer;
 			timer.pause();
 		});
 	}
 	
 	void start()
 	{
-		_battleTimers.forEach((object)
+		_battleTimers.forEach((TimerCharacterMap object)
 		{
-			BattleTimer timer = object.timer;
+			BattleTimer timer = object.battleTimer;
 			timer.start();
 		});
 	}
@@ -195,11 +192,11 @@ class Initiative
 	
 	void onDeath(Character character)
 	{
-		var hash = _battleTimers.firstWhere((object)
+		TimerCharacterMap hash = _battleTimers.firstWhere((TimerCharacterMap object)
 		{
 			return object.character == character;
 		});
-		BattleTimer characterTimer = hash.timer;
+		BattleTimer characterTimer = hash.battleTimer;
 		characterTimer.pause();
 		bool allMonstersDead = monsters.every((Monster monster)
 		{
@@ -226,5 +223,17 @@ class Initiative
             return;
 		}
 	}
+}
+
+class TimerCharacterMap
+{
+	BattleTimer battleTimer;
+	StreamSubscription battleTimerSubscription;
+	Character character;
+	StreamSubscription characterSubscription;
 	
+	TimerCharacterMap(this.battleTimer, this.battleTimerSubscription, this.character, this.characterSubscription)
+	{
+		
+	}
 }

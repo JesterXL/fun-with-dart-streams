@@ -28,13 +28,36 @@ void main()
 //	testActionResult();
 	
 //	testInitiative();
-	testingLockeSprite();
-//	testCharacterList();
+//	testingLockeSprite();
+	testCharacterList();
 }
 
 void testCharacterList()
 {
-	CharacterList characterList = new CharacterList();
+	Stage stage = new Stage(html.querySelector('#stage'), webGL: false);
+    stage.scaleMode = StageScaleMode.SHOW_ALL;
+    stage.align = StageAlign.NONE;
+	RenderLoop renderLoop = new RenderLoop();
+	renderLoop.addStage(stage);
+	
+    GameLoop loop = new GameLoop();
+	loop.start();
+	
+	ObservableList<Player> players = new ObservableList<Player>();
+	players.add(new Player());
+	players.add(new Player());
+	players.add(new Player());
+	
+	ObservableList<Monster> monsters = new ObservableList<Monster>();
+	monsters.add(new Monster());
+	monsters.add(new Monster());
+	monsters.add(new Monster());
+	
+	Initiative initiative = new Initiative(loop.stream, players, monsters);
+	CharacterList characterList = new CharacterList(initiative);
+    stage.addChild(characterList);
+    
+	
 	
 }
 
@@ -462,12 +485,3 @@ void testBattleUtilsGetRandomNumber()
 	print(BattleUtils.getRandomNumberFromRange(1, 3));
 	print(BattleUtils.getRandomNumberFromRange(1, 3));
 }
-
-class SampleTicker extends Ticker
-{
-	void tick(num time)
-	{
-		print("time: $time");
-	}
-}
-
