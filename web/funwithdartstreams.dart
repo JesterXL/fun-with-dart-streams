@@ -63,7 +63,46 @@ void testCharacterList()
 	CharacterList characterList = new CharacterList(initiative, resourceManager);
     stage.addChild(characterList);
     
-	
+    Shape fadeShapeScreen = new Shape();
+    fadeShapeScreen.graphics.rect(0, 0, 480, 420);
+    fadeShapeScreen.graphics.fillColor(Color.Black);
+    stage.addChild(fadeShapeScreen);
+    
+	resourceManager.addSound("battleTheme", "../audio/battle-theme.mp3");
+	resourceManager.addSound("encounter", "../audio/encounter.mp3");
+	SoundTransform soundTransform = new SoundTransform(1);
+	resourceManager.load()
+	.then((_)
+	{
+		Sound sound = resourceManager.getSound("encounter");
+		SoundChannel soundChannel = sound.play(false, soundTransform);
+//		soundChannel.on("completeEvent").listen((_)
+//		{
+//			print("um...");
+//		});
+//		print("engine: " + SoundMixer.engine);
+//		WebAudioApiMixer.audioContext.onComplete.listen((_)
+//		{
+//			print("sup");
+//		});
+		// can't find out why the above don't work.
+		num milliseconds = sound.length * 1000;
+		return new Future.delayed(new Duration(milliseconds: milliseconds.ceil()), ()
+		{
+			return true;
+		});
+	})
+	.then((_)
+	{
+		var sound = resourceManager.getSound("battleTheme");
+        var soundChannel = sound.play(true, soundTransform);
+        
+        var tween = new Tween(fadeShapeScreen, 0.5, TransitionFunction.easeOutExponential);
+        tween.animate.alpha.to(0);
+        tween.onComplete = () => fadeShapeScreen.removeFromParent();
+
+        renderLoop.juggler.add(tween);
+	});
 	
 }
 
