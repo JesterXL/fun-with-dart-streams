@@ -27,18 +27,21 @@ class BattleTimerBar extends DisplayObjectContainer
 	
 	void init()
 	{
+		const int WIDTH = 81;
+		const int HEIGHT = 15;
+		
 		back = new Shape();
-		back.graphics.rect(0,  0,  100,  20);
+		back.graphics.rect(0,  0,  WIDTH,  HEIGHT);
 		back.graphics.fillColor(Color.Blue);
 		addChild(back);
 		
 		green = new Shape();
-		green.graphics.rect(0, 0, 100, 20);
+		green.graphics.rect(0, 0, WIDTH, HEIGHT);
 		green.graphics.fillColor(Color.Yellow);
 		addChild(green);
 		
 		bar = new Shape();
-		bar.graphics.rect(0, 0, 100, 20);
+		bar.graphics.rect(0, 0, WIDTH, HEIGHT);
 		bar.x = 1;
 		bar.y = 1;
 		bar.graphics.strokeColor(Color.Black, 2);

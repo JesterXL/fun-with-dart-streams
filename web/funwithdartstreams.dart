@@ -35,18 +35,23 @@ void main()
 void testCharacterList()
 {
 	Stage stage = new Stage(html.querySelector('#stage'), webGL: false);
-    stage.scaleMode = StageScaleMode.SHOW_ALL;
-    stage.align = StageAlign.NONE;
+//    stage.scaleMode = StageScaleMode.SHOW_ALL;
+//    stage.align = StageAlign.NONE;
 	RenderLoop renderLoop = new RenderLoop();
 	renderLoop.addStage(stage);
+	
+	Shape border = new Shape();
+	border.graphics.rect(0, 0, 480, 420);
+	border.graphics.strokeColor(Color.Black);
+	stage.addChild(border);
 	
     GameLoop loop = new GameLoop();
 	loop.start();
 	
 	ObservableList<Player> players = new ObservableList<Player>();
-	players.add(new Player());
-	players.add(new Player());
-	players.add(new Player());
+	players.add(new Player(Player.LOCKE));
+	players.add(new Player(Player.TERRA));
+	players.add(new Player(Player.SETZER));
 	
 	ObservableList<Monster> monsters = new ObservableList<Monster>();
 	monsters.add(new Monster());
@@ -54,7 +59,8 @@ void testCharacterList()
 	monsters.add(new Monster());
 	
 	Initiative initiative = new Initiative(loop.stream, players, monsters);
-	CharacterList characterList = new CharacterList(initiative);
+	ResourceManager resourceManager = new ResourceManager();
+	CharacterList characterList = new CharacterList(initiative, resourceManager);
     stage.addChild(characterList);
     
 	

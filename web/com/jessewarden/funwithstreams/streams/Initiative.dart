@@ -23,8 +23,7 @@ class Initiative
 	
 	void init()
 	{
-		_streamController = new StreamController<InitiativeEvent>(onPause: onPause,
-                															onResume: onResume);
+		_streamController = new StreamController<InitiativeEvent>(onPause: onPause, onResume: onResume);
 		stream = _streamController.stream.asBroadcastStream();
 		List participants = new List();
 		participants.add(players);
@@ -58,23 +57,7 @@ class Initiative
 			{
 				TimerCharacterMap matched = _battleTimers.firstWhere((TimerCharacterMap map)
 				{
-					try
-					{
-						if(map == null || map.battleTimer == null)
-						{
-							throw "Wait, what?";
-						}
-						else if(event == null || event.target == null)
-						{
-							throw "I don't even...";
-						}
-						return map.battleTimer == event.target;
-					}
-					catch(e)
-					{
-						print("error in firstWhere: $e");
-					}
-					return false;
+					return map.battleTimer == event.target;
 				});
 				Character targetCharacter = matched.character;
 				charactersReady.add(targetCharacter);

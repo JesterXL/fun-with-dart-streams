@@ -40,6 +40,8 @@ abstract class SpriteSheet extends DisplayObjectContainer
         addChild(_bitmap);
 	}
 	
+	void init(){}
+	
 	void render(RenderState renderState)
 	{
 		super.render(renderState);
