@@ -68,12 +68,23 @@ void testCharacterList()
     fadeShapeScreen.graphics.fillColor(Color.Black);
     stage.addChild(fadeShapeScreen);
     
+    resourceManager.addBitmapData("battleTintTop", "../design/battle-tint-top.png");
+    resourceManager.addBitmapData("battleTintBottom", "../design/battle-tint-bottom.png");
+    
 	resourceManager.addSound("battleTheme", "../audio/battle-theme.mp3");
 	resourceManager.addSound("encounter", "../audio/encounter.mp3");
 	SoundTransform soundTransform = new SoundTransform(1);
+	Bitmap topTint;
+	Bitmap bottomTint;
 	resourceManager.load()
 	.then((_)
 	{
+		topTint = new Bitmap(resourceManager.getBitmapData("battleTintTop"));
+		bottomTint = new Bitmap(resourceManager.getBitmapData("battleTintBottom"));
+		stage.addChild(topTint);
+		bottomTint.y = 94;
+		stage.addChild(bottomTint);
+		
 		Sound sound = resourceManager.getSound("encounter");
 		SoundChannel soundChannel = sound.play(false, soundTransform);
 //		soundChannel.on("completeEvent").listen((_)
@@ -97,11 +108,28 @@ void testCharacterList()
 		var sound = resourceManager.getSound("battleTheme");
         var soundChannel = sound.play(true, soundTransform);
         
-        var tween = new Tween(fadeShapeScreen, 0.5, TransitionFunction.easeOutExponential);
+        
+        var tween = new Tween(fadeShapeScreen, 0.8, TransitionFunction.easeOutExponential);
         tween.animate.alpha.to(0);
         tween.onComplete = () => fadeShapeScreen.removeFromParent();
+        
+        const double TINT_FADE_TIME = 1.0;
+        
+        var topTintTween = new Tween(topTint, TINT_FADE_TIME, TransitionFunction.easeOutExponential);
+        topTintTween.animate.alpha.to(0);
+        topTintTween.animate.y.to(-200);
+        topTintTween.delay = 0.1;
+        topTintTween.onComplete = () => topTint.removeFromParent();
+        
+        var bottomTintTween = new Tween(bottomTint, TINT_FADE_TIME, TransitionFunction.easeOutExponential);
+        bottomTintTween.animate.alpha.to(0);
+        bottomTintTween.animate.y.to(294);
+        bottomTintTween.delay = 0.1;
+        bottomTintTween.onComplete = () => bottomTint.removeFromParent();
+        
+        stage.setChildIndex(fadeShapeScreen, stage.numChildren - 1);
 
-        renderLoop.juggler.add(tween);
+        renderLoop.juggler.addGroup([tween, topTintTween, bottomTintTween]);
 	});
 	
 }
