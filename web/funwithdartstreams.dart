@@ -73,7 +73,7 @@ void testCharacterList()
     
 	resourceManager.addSound("battleTheme", "../audio/battle-theme.mp3");
 	resourceManager.addSound("encounter", "../audio/encounter.mp3");
-	SoundTransform soundTransform = new SoundTransform(1);
+	SoundTransform soundTransform = new SoundTransform(0.1);
 	Bitmap topTint;
 	Bitmap bottomTint;
 	resourceManager.load()

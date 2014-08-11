@@ -8,6 +8,9 @@ class BattleTimerBar extends DisplayObjectContainer
 	num _percentage = 1;
 	bool percentageDirty = false;
 	
+	static const int WIDTH = 81;
+    static const int HEIGHT = 15;
+	
 	num get percentage => _percentage;
 	void set percentage(num value)
 	{
@@ -27,8 +30,7 @@ class BattleTimerBar extends DisplayObjectContainer
 	
 	void init()
 	{
-		const int WIDTH = 81;
-		const int HEIGHT = 15;
+		
 		
 		back = new Shape();
 		back.graphics.rect(0,  0,  WIDTH,  HEIGHT);
@@ -54,7 +56,7 @@ class BattleTimerBar extends DisplayObjectContainer
 		if(percentageDirty)
 		{
 			percentageDirty = false;
-			green.width = 100 * _percentage;
+			green.width = WIDTH * _percentage;
 		}
 	}
 }

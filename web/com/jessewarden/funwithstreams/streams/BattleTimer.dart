@@ -172,7 +172,7 @@ class BattleTimer
 		if (gauge >= MAX)
 		{
 			// dispatch complete
-			gauge = 0;
+			gauge = MAX;
 			_streamController.add(new BattleTimerEvent(BattleTimerEvent.COMPLETE, this));
 		}
 	}

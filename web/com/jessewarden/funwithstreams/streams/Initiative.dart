@@ -59,6 +59,7 @@ class Initiative
 				{
 					return map.battleTimer == event.target;
 				});
+				matched.battleTimer.pause();
 				Character targetCharacter = matched.character;
 				charactersReady.add(targetCharacter);
 				_streamController.add(new InitiativeEvent(InitiativeEvent.CHARACTER_READY,
