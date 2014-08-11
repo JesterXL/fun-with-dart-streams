@@ -1,6 +1,6 @@
 import 'dart:core';
 import 'dart:async';
-import 'dart:html' as html;
+import 'dart:html';
 import 'com/jessewarden/funwithstreams/funwithstreamslib.dart';
 import 'package:observe/observe.dart';
 import 'package:stagexl/stagexl.dart';
@@ -29,7 +29,45 @@ void main()
 	
 //	testInitiative();
 //	testingLockeSprite();
-	testCharacterList();
+//	testCharacterList();
+	
+	testMenu();
+}
+
+void testMenu()
+{
+	CanvasElement canvas = querySelector('#stage');
+	canvas.context2D.imageSmoothingEnabled = true;
+	Stage stage = new Stage(canvas, webGL: false);
+	RenderLoop renderLoop = new RenderLoop();
+	renderLoop.addStage(stage);
+	
+	Shape fadeShapeScreen = new Shape();
+    fadeShapeScreen.graphics.rect(0, 0, 480, 420);
+    fadeShapeScreen.graphics.fillColor(Color.Black);
+    stage.addChild(fadeShapeScreen);
+//   
+//	Shape border = new Shape();
+//	border.graphics.rectRound(0, 0, 300, 280, 6, 6);
+//	border.graphics.fillColor(Color.Blue);
+//	border.graphics.strokeColor(Color.White, 4);
+//	stage.addChild(border);
+//	border.x = 20;
+//	border.y = 20;
+	
+	GameLoop loop = new GameLoop();
+	loop.start();
+	
+	ObservableList<MenuItem> items = new ObservableList<MenuItem>();
+	items.add(new MenuItem("Uno"));
+	items.add(new MenuItem("Dos"));
+	items.add(new MenuItem("Tres"));
+	
+	Menu menu = new Menu(300, 280, items);
+    stage.addChild(menu);
+    menu.x = 20;
+    menu.y = 20;
+	
 }
 
 void testCharacterList()

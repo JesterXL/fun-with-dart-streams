@@ -26,9 +26,11 @@ part "HitResult.dart";
 part "streams/Initiative.dart";
 part "events/InitiativeEvent.dart";
 part "vos/TargetHitResult.dart";
+part "vos/MenuItem.dart";
 
 part "components/BattleTimerBar.dart";
 part "components/CharacterList.dart";
+part "components/Menu.dart";
 
 part "sprites/SpriteSheet.dart";
 part "sprites/LockeSprite.dart";

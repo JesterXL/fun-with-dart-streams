@@ -59,6 +59,7 @@ class Initiative
 				{
 					return map.battleTimer == event.target;
 				});
+				// NOTE: pausing the BattleTimer, not the Stream listener... lol, streams!
 				matched.battleTimer.pause();
 				Character targetCharacter = matched.character;
 				charactersReady.add(targetCharacter);
