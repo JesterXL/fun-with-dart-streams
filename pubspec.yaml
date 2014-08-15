@@ -6,3 +6,4 @@ dependencies:
   polymer: any
   stagexl: any
   statemachine: any
+  three: any
