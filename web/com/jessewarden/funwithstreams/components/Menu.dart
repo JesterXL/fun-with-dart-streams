@@ -8,6 +8,7 @@ class Menu extends DisplayObjectContainer
 	ObservableList<MenuItem> _menuItems;
 	ObservableList<MenuItem> get menuItems => _menuItems;
 	StreamController _controller;
+	bool _redrew = false;
 	
 	Shape _border;
 	Sprite _items;
@@ -44,6 +45,11 @@ class Menu extends DisplayObjectContainer
 			print("text: " + data["data"]);
 		});
     	
+    	_menuItems.changes.listen((List<ChangeRecord> changes)
+		{
+			redraw();
+		});
+    	
     	_controller = new StreamController();
     	stream = _controller.stream;
 	}
@@ -75,19 +81,22 @@ class Menu extends DisplayObjectContainer
 	
 	void redraw()
 	{
+		_redrew = true;
+		
 		if(_items.numChildren > 1)
 		{
-			while(_items.numChildren > 2)
+			while(_items.numChildren > 0)
 			{
-				DisplayObject removedKid = _items.getChildAt(numChildren - 1);
-				removeChildAt(_items.numChildren - 1);
+//				print("len: " + _items.numChildren.toString());
+				DisplayObject removedKid = _items.getChildAt(_items.numChildren - 1);
+				_items.removeChildAt(_items.numChildren - 1);
 				if(removedKid is TextField)
 				{
 					_fieldPool.add(removedKid);
 				}
 				else if(removedKid is Sprite)
 				{
-					_fieldPool.add(removedKid);
+					_spritePool.add(removedKid);
 				}
 				else
 				{
@@ -124,11 +133,10 @@ class Menu extends DisplayObjectContainer
 			// making shapes for hit areas
 			Sprite hitArea = getSprite();
 			_items.addChild(hitArea);
-			
 			hitArea.graphics.rect(0, 0, field.width, 24);
 			hitArea.graphics.fillColor(Color.Green);
 			hitArea.graphics.strokeColor(Color.Black);
-			hitArea.alpha = 0.3;
+			hitArea.alpha = 0.0;
 			hitArea.x = field.x;
 			hitArea.y = field.y + field.height - hitArea.height;
 			hitArea.userData = {"type": "hitArea", "data": item.name};
@@ -144,5 +152,11 @@ class Menu extends DisplayObjectContainer
 	void render(RenderState renderState)
 	{
 		super.render(renderState);
+		
+		if(_redrew)
+		{
+			_redrew = false;
+			renderState.flush();
+		}
 	}
 }

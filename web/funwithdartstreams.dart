@@ -67,6 +67,18 @@ void testMenu()
     stage.addChild(menu);
     menu.x = 20;
     menu.y = 20;
+    
+    new Future.delayed(new Duration(seconds: 1), ()
+	{
+		items.add(new MenuItem("Quatro"));
+		return new Future.delayed(new Duration(seconds: 3), ()
+		{
+			return true;
+		});
+	}).then((_)
+	{
+		items.removeAt(1);
+	});
 	
 }
 
