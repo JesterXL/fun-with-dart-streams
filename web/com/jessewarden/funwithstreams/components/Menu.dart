@@ -8,13 +8,13 @@ class Menu extends DisplayObjectContainer
 	ObservableList<MenuItem> _menuItems;
 	ObservableList<MenuItem> get menuItems => _menuItems;
 	StreamController _controller;
-	bool _redrew = false;
 	
 	Shape _border;
 	Sprite _items;
 	List<TextField> _fieldPool = new List<TextField>();
 	List<Sprite> _spritePool = new List<Sprite>();
 	
+	List<Sprite> hitAreas;
 	Stream stream;
 	
 	Menu(num this._width, num this._height, ObservableList<MenuItem> this._menuItems)
@@ -42,7 +42,7 @@ class Menu extends DisplayObjectContainer
     	.listen((MouseEvent event)
 		{
     		Object data = event.target.userData;
-			print("text: " + data["data"]);
+			_controller.add(data["data"]);
 		});
     	
     	_menuItems.changes.listen((List<ChangeRecord> changes)
@@ -81,8 +81,6 @@ class Menu extends DisplayObjectContainer
 	
 	void redraw()
 	{
-		_redrew = true;
-		
 		if(_items.numChildren > 1)
 		{
 			while(_items.numChildren > 0)
@@ -107,7 +105,14 @@ class Menu extends DisplayObjectContainer
 		
     	num startX = 24;
     	num startY = 0;
-    	List<Sprite> hitAreas = new List<Sprite>();
+    	if(hitAreas == null)
+    	{
+    		hitAreas = new List<Sprite>();
+    	}
+    	else
+    	{
+    		hitAreas.clear();
+    	}
     	
     	_menuItems.forEach((MenuItem item)
 		{
@@ -152,11 +157,5 @@ class Menu extends DisplayObjectContainer
 	void render(RenderState renderState)
 	{
 		super.render(renderState);
-		
-		if(_redrew)
-		{
-			_redrew = false;
-			renderState.flush();
-		}
 	}
 }

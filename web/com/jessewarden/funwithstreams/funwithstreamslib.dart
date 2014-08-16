@@ -34,3 +34,6 @@ part "components/Menu.dart";
 
 part "sprites/SpriteSheet.dart";
 part "sprites/LockeSprite.dart";
+
+part "managers/CursorTarget.dart";
+part "managers/CursorFocusManager.dart";

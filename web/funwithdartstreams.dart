@@ -4,6 +4,8 @@ import 'dart:html';
 import 'com/jessewarden/funwithstreams/funwithstreamslib.dart';
 import 'package:observe/observe.dart';
 import 'package:stagexl/stagexl.dart';
+import 'package:stream_ext/stream_ext.dart';
+import 'TestingCharacterList.dart';
 
 void main()
 {
@@ -22,6 +24,7 @@ void main()
 //	testBattleTimer();
 //	testBasicStreamsNoClasses();
 //	testBasicController();
+//	testStreamExt();
 //	testObservableList();
 //	testFutureWithDataAndStream();
 	
@@ -30,8 +33,60 @@ void main()
 //	testInitiative();
 //	testingLockeSprite();
 //	testCharacterList();
+	testCursorManager();
 	
-	testMenu();
+//	testMenu();
+}
+
+void testCursorManager()
+{
+	CanvasElement canvas = querySelector('#stage');
+	canvas.context2D.imageSmoothingEnabled = true;
+	Stage stage = new Stage(canvas, webGL: false);
+	RenderLoop renderLoop = new RenderLoop();
+	renderLoop.addStage(stage);
+	ResourceManager resourceManager = new ResourceManager();
+	GameLoop loop = new GameLoop();
+    loop.start();
+    
+    ObservableList<MenuItem> items = new ObservableList<MenuItem>();
+	items.add(new MenuItem("Uno"));
+	items.add(new MenuItem("Dos"));
+	items.add(new MenuItem("Tres"));
+	
+	Menu menu = new Menu(300, 280, items);
+    stage.addChild(menu);
+    menu.x = 20;
+    menu.y = 20;
+    
+    CursorFocusManager manager = new CursorFocusManager(stage, resourceManager);
+    resourceManager.load()
+    .then((_)
+    {
+    	manager.targets.clear();
+    	menu.hitAreas.forEach((DisplayObject item)
+		{
+			manager.targets.add(item);
+		});
+         manager.selectedIndex = 0;
+    });
+    
+    stage.onKeyDown.listen((KeyboardEvent event)
+	{
+    	switch(event.keyCode)
+    	{
+    		case 38:
+    			manager.previousTarget();
+    			break;
+    		
+    		case 40:
+    			manager.nextTarget();
+    			break;
+    	}
+	});
+    
+    stage.focus = stage;
+   
 }
 
 void testMenu()
@@ -84,104 +139,7 @@ void testMenu()
 
 void testCharacterList()
 {
-	Stage stage = new Stage(html.querySelector('#stage'), webGL: false);
-//    stage.scaleMode = StageScaleMode.SHOW_ALL;
-//    stage.align = StageAlign.NONE;
-	RenderLoop renderLoop = new RenderLoop();
-	renderLoop.addStage(stage);
-	
-	Shape border = new Shape();
-	border.graphics.rect(0, 0, 480, 420);
-	border.graphics.strokeColor(Color.Black);
-	stage.addChild(border);
-	
-    GameLoop loop = new GameLoop();
-	loop.start();
-	
-	ObservableList<Player> players = new ObservableList<Player>();
-	players.add(new Player(Player.LOCKE));
-	players.add(new Player(Player.TERRA));
-	players.add(new Player(Player.SETZER));
-	
-	ObservableList<Monster> monsters = new ObservableList<Monster>();
-	monsters.add(new Monster());
-	monsters.add(new Monster());
-	monsters.add(new Monster());
-	
-	Initiative initiative = new Initiative(loop.stream, players, monsters);
-	ResourceManager resourceManager = new ResourceManager();
-	CharacterList characterList = new CharacterList(initiative, resourceManager);
-    stage.addChild(characterList);
-    
-    Shape fadeShapeScreen = new Shape();
-    fadeShapeScreen.graphics.rect(0, 0, 480, 420);
-    fadeShapeScreen.graphics.fillColor(Color.Black);
-    stage.addChild(fadeShapeScreen);
-    
-    resourceManager.addBitmapData("battleTintTop", "../design/battle-tint-top.png");
-    resourceManager.addBitmapData("battleTintBottom", "../design/battle-tint-bottom.png");
-    
-	resourceManager.addSound("battleTheme", "../audio/battle-theme.mp3");
-	resourceManager.addSound("encounter", "../audio/encounter.mp3");
-	SoundTransform soundTransform = new SoundTransform(0.1);
-	Bitmap topTint;
-	Bitmap bottomTint;
-	resourceManager.load()
-	.then((_)
-	{
-		topTint = new Bitmap(resourceManager.getBitmapData("battleTintTop"));
-		bottomTint = new Bitmap(resourceManager.getBitmapData("battleTintBottom"));
-		stage.addChild(topTint);
-		bottomTint.y = 94;
-		stage.addChild(bottomTint);
-		
-		Sound sound = resourceManager.getSound("encounter");
-		SoundChannel soundChannel = sound.play(false, soundTransform);
-//		soundChannel.on("completeEvent").listen((_)
-//		{
-//			print("um...");
-//		});
-//		print("engine: " + SoundMixer.engine);
-//		WebAudioApiMixer.audioContext.onComplete.listen((_)
-//		{
-//			print("sup");
-//		});
-		// can't find out why the above don't work.
-		num milliseconds = sound.length * 1000;
-		return new Future.delayed(new Duration(milliseconds: milliseconds.ceil()), ()
-		{
-			return true;
-		});
-	})
-	.then((_)
-	{
-		var sound = resourceManager.getSound("battleTheme");
-        var soundChannel = sound.play(true, soundTransform);
-        
-        
-        var tween = new Tween(fadeShapeScreen, 0.8, TransitionFunction.easeOutExponential);
-        tween.animate.alpha.to(0);
-        tween.onComplete = () => fadeShapeScreen.removeFromParent();
-        
-        const double TINT_FADE_TIME = 1.0;
-        
-        var topTintTween = new Tween(topTint, TINT_FADE_TIME, TransitionFunction.easeOutExponential);
-        topTintTween.animate.alpha.to(0);
-        topTintTween.animate.y.to(-200);
-        topTintTween.delay = 0.1;
-        topTintTween.onComplete = () => topTint.removeFromParent();
-        
-        var bottomTintTween = new Tween(bottomTint, TINT_FADE_TIME, TransitionFunction.easeOutExponential);
-        bottomTintTween.animate.alpha.to(0);
-        bottomTintTween.animate.y.to(294);
-        bottomTintTween.delay = 0.1;
-        bottomTintTween.onComplete = () => bottomTint.removeFromParent();
-        
-        stage.setChildIndex(fadeShapeScreen, stage.numChildren - 1);
-
-        renderLoop.juggler.addGroup([tween, topTintTween, bottomTintTween]);
-	});
-	
+	new TestingCharacterList();
 }
 
 
@@ -324,35 +282,48 @@ void testObservableList()
 	list.add("cow");
 }
 
+void testStreamExt()
+{
+	StreamController controller1 = new StreamController.broadcast();
+	StreamController controller2 = new StreamController.broadcast();
+
+	Stream merged  = StreamExt.merge(controller1.stream, controller2.stream);
+    merged.listen((_)
+	{
+		print("merged listen: $_");
+	});
+    
+    controller1.add("sup on 1");
+    controller2.add("yo on 2");
+}
+
 void testBasicController()
 {
-//	List myList = new List();
-//	StreamController controller = new StreamController();
-//	controller.stream.listen((_)
-//	{
-//		print("data: $_");
-//	});
-//	controller.add("sup");
+	StreamController firstController = new StreamController();
+	StreamController controller = new StreamController();
 	
-	List myList = new List();
-    	
-    Stream myStream = new Stream.fromIterable(myList);
-    StreamController controller = new StreamController();
+	print("first");
+	controller.addStream(firstController.stream)
+	.then((_)
+	{
+		print("second");
+	});
+	
 	controller.stream.listen((_)
 	{
-		print("stream listen, data: $_");
+		print("listen: $_");
 	});
-    controller.addStream(myStream)
-    .then((_)
-    {
-    	print("ready");
-//    	controller.add("sup");
-    	myList.add("new value");
-    })
-    .catchError((error)
-    {
-    	print("some error");
-    });
+	
+	new Future.delayed(new Duration(seconds: 1), ()
+	{
+		firstController.add("sup");
+	});
+
+	new Future.delayed(new Duration(seconds: 2), ()
+	{
+		controller.add("second sup");
+	});
+
 }
 
 void testBasicStreamsNoClasses()

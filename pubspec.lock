@@ -73,6 +73,10 @@ packages:
     description: statemachine
     source: hosted
     version: "1.0.2"
+  stream_ext:
+    description: stream_ext
+    source: hosted
+    version: "0.4.0"
   string_scanner:
     description: string_scanner
     source: hosted

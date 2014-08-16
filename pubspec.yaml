@@ -6,4 +6,4 @@ dependencies:
   polymer: any
   stagexl: any
   statemachine: any
-  three: any
+  stream_ext: any
