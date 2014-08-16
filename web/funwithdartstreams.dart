@@ -49,12 +49,12 @@ void testCursorManager()
 	GameLoop loop = new GameLoop();
     loop.start();
     
-    ObservableList<MenuItem> items = new ObservableList<MenuItem>();
-	items.add(new MenuItem("Uno"));
-	items.add(new MenuItem("Dos"));
-	items.add(new MenuItem("Tres"));
+    ObservableList<MenuItem> menuItems = new ObservableList<MenuItem>();
+    menuItems.add(new MenuItem("Uno"));
+    menuItems.add(new MenuItem("Dos"));
+    menuItems.add(new MenuItem("Tres"));
 	
-	Menu menu = new Menu(300, 280, items);
+	Menu menu = new Menu(300, 280, menuItems);
     stage.addChild(menu);
     menu.x = 20;
     menu.y = 20;
@@ -69,21 +69,16 @@ void testCursorManager()
 			manager.targets.add(item);
 		});
          manager.selectedIndex = 0;
+         manager.stream
+         .where((CursorFocusManagerEvent event)
+	    {
+        	 return event.type == CursorFocusManagerEvent.SELECTED;
+	    })
+        .listen((CursorFocusManagerEvent event)
+		 {
+	 		print("selected " + menuItems[manager.selectedIndex].name);
+		 });
     });
-    
-    stage.onKeyDown.listen((KeyboardEvent event)
-	{
-    	switch(event.keyCode)
-    	{
-    		case 38:
-    			manager.previousTarget();
-    			break;
-    		
-    		case 40:
-    			manager.nextTarget();
-    			break;
-    	}
-	});
     
     stage.focus = stage;
    

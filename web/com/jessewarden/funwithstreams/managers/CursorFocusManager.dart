@@ -5,6 +5,11 @@ class CursorFocusManager
 	Stage _stage;
 	ResourceManager _resourceManager;
 	Bitmap _cursorBitmap;
+	StreamController _controller;
+	
+	Stream stream;
+	
+	
 	
 	
 	CursorFocusManager(Stage this._stage, ResourceManager this._resourceManager)
@@ -14,6 +19,9 @@ class CursorFocusManager
 	
 	void init()
 	{
+		_controller = new StreamController.broadcast();
+		stream = _controller.stream;
+		
 		if(_resourceManager.containsBitmapData('cursor') == false)
 		{
 			_resourceManager.addBitmapData('cursor', '../design/cursor.png');
@@ -24,6 +32,37 @@ class CursorFocusManager
 			_cursorBitmap = new Bitmap(_resourceManager.getBitmapData('cursor'));
 			_stage.addChild(_cursorBitmap);
 		});
+		
+		targets.listChanges.listen((List<ListChangeRecord> changes)
+		{
+			if(targets.length < 1)
+			{
+				_setCursorVisible(false);
+			}
+			else
+			{
+				_setCursorVisible(true);
+			}
+		});
+		
+		_stage.onKeyDown.listen((KeyboardEvent event)
+    	{
+        	switch(event.keyCode)
+        	{
+        		case 87: // w
+        		case 38: // up arrow
+        			previousTarget();
+        			break;
+        		
+        		case 83: // s
+        		case 40: // down arrow
+        			nextTarget();
+        			break;
+        		
+        		case 13: // enter
+        			_controller.add(new CursorFocusManagerEvent(CursorFocusManagerEvent.SELECTED));
+        	}
+    	});
 	}
 	
 	
@@ -36,6 +75,14 @@ class CursorFocusManager
 	{
 		_selectedIndex = newValue;
 		_selectCurrentElement();
+	}
+	
+	void _setCursorVisible(bool show)
+	{
+		if(_cursorBitmap != null)
+		{
+			_cursorBitmap.visible = show;
+		}
 	}
 	
 	void _selectCurrentElement()
@@ -54,9 +101,9 @@ class CursorFocusManager
 		
 		DisplayObject target = targets[_selectedIndex];
 		_cursorBitmap.visible = true;
-		Point point = target.localToGlobal(new Point(target.x, target.y));
-		_cursorBitmap.x = point.x - 2;
-		_cursorBitmap.y = point.y + target.height / 2 - _cursorBitmap.height / 2;
+		Point point = target.parent.localToGlobal(new Point(target.x, target.y));
+		_cursorBitmap.x = point.x - _cursorBitmap.width - 2;
+		_cursorBitmap.y = point.y + target.height / 2;
 	}
 	
 	void nextTarget()
@@ -74,6 +121,7 @@ class CursorFocusManager
 		{
 			_selectedIndex = 0;
 		}
+		_controller.add(new CursorFocusManagerEvent(CursorFocusManagerEvent.INDEX_CHANGED));
 		_selectCurrentElement();
 	}
 	
@@ -92,6 +140,7 @@ class CursorFocusManager
 		{
 			_selectedIndex = targets.length - 1;
 		}
+		_controller.add(new CursorFocusManagerEvent(CursorFocusManagerEvent.INDEX_CHANGED));
 		_selectCurrentElement();
 	}
 	

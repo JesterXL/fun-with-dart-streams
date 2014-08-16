@@ -37,3 +37,4 @@ part "sprites/LockeSprite.dart";
 
 part "managers/CursorTarget.dart";
 part "managers/CursorFocusManager.dart";
+part "events/CursorFocusManagerEvent.dart";
