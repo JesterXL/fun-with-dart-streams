@@ -9,12 +9,14 @@ class CursorFocusManager
 	
 	Stream stream;
 	
-	
-	
-	
 	CursorFocusManager(Stage this._stage, ResourceManager this._resourceManager)
 	{
 		init();
+	}
+	
+	void hackToTop()
+	{
+		_stage.setChildIndex(_cursorBitmap, _stage.numChildren - 1);
 	}
 	
 	void init()
@@ -24,7 +26,7 @@ class CursorFocusManager
 		
 		if(_resourceManager.containsBitmapData('cursor') == false)
 		{
-			_resourceManager.addBitmapData('cursor', '../design/cursor.png');
+			_resourceManager.addBitmapData('cursor', 'design/cursor.png');
 		}
 		_resourceManager.load()
 		.then((_)
@@ -61,6 +63,15 @@ class CursorFocusManager
         		
         		case 13: // enter
         			_controller.add(new CursorFocusManagerEvent(CursorFocusManagerEvent.SELECTED));
+        			break;
+        			
+        		case 39: // right
+        			_controller.add(new CursorFocusManagerEvent(CursorFocusManagerEvent.MOVE_RIGHT));
+                    break;
+        			
+        		case 37: // left
+        			_controller.add(new CursorFocusManagerEvent(CursorFocusManagerEvent.MOVE_LEFT));
+                    break;
         	}
     	});
 	}

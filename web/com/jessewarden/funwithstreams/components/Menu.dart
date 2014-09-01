@@ -7,6 +7,21 @@ class Menu extends DisplayObjectContainer
 	num _height;
 	ObservableList<MenuItem> _menuItems;
 	ObservableList<MenuItem> get menuItems => _menuItems;
+	StreamSubscription _streamSubscription;
+	void set menuItems(ObservableList<MenuItem> newItems)
+	{
+		if(_streamSubscription != null)
+		{
+			_streamSubscription.cancel();
+			_streamSubscription = null;
+		}
+		_menuItems = newItems;
+		_streamSubscription = _menuItems.changes.listen((List<ChangeRecord> changes)
+		{
+			redraw();
+		});
+	}
+	
 	StreamController _controller;
 	
 	Shape _border;
@@ -17,12 +32,12 @@ class Menu extends DisplayObjectContainer
 	List<Sprite> hitAreas;
 	Stream stream;
 	
-	Menu(num this._width, num this._height, ObservableList<MenuItem> this._menuItems)
-	{
+	Menu(num this._width, num this._height, ObservableList<MenuItem> this._menuItems){
+		createChildren();
 		init();
 	}
 	
-	void init()
+	void createChildren()
 	{
 		_border = new Shape();
 		_border.graphics.rectRound(0, 0, _width, _height, 6, 6);
@@ -32,9 +47,12 @@ class Menu extends DisplayObjectContainer
 		
 		_items = new Sprite();
         addChild(_items);
-            	
-		redraw();
-		
+        
+        redraw();
+	}
+	
+	void init()
+	{
     	onMouseClick.where((MouseEvent event)
 		{
 			return event.target is Sprite;
@@ -43,11 +61,6 @@ class Menu extends DisplayObjectContainer
 		{
     		Object data = event.target.userData;
 			_controller.add(data["data"]);
-		});
-    	
-    	_menuItems.changes.listen((List<ChangeRecord> changes)
-		{
-			redraw();
 		});
     	
     	_controller = new StreamController();
@@ -112,6 +125,11 @@ class Menu extends DisplayObjectContainer
     	else
     	{
     		hitAreas.clear();
+    	}
+    	
+    	if(_menuItems == null)
+    	{
+    		return;
     	}
     	
     	_menuItems.forEach((MenuItem item)

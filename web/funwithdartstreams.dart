@@ -4,7 +4,7 @@ import 'dart:html';
 import 'com/jessewarden/funwithstreams/funwithstreamslib.dart';
 import 'package:observe/observe.dart';
 import 'package:stagexl/stagexl.dart';
-import 'package:stream_ext/stream_ext.dart';
+import 'package:jxlstatemachine/jxlstatemachine.dart';
 import 'TestingCharacterList.dart';
 
 void main()
@@ -33,19 +33,132 @@ void main()
 //	testInitiative();
 //	testingLockeSprite();
 //	testCharacterList();
-	testCursorManager();
+//	testCursorManager();
 	
 //	testMenu();
+	
+	testBattleMenu();
+}
+
+void testBattleMenu()
+{
+	CanvasElement canvas = querySelector('#stage');
+	canvas.context2D.imageSmoothingEnabled = true;
+	
+	Stage stage = new Stage(canvas, webGL: false);
+	RenderLoop renderLoop = new RenderLoop();
+	renderLoop.addStage(stage);
+	
+	ObservableList<MenuItem> mainMenuItems = new ObservableList<MenuItem>();
+	mainMenuItems.add(new MenuItem("Attack"));
+	mainMenuItems.add(new MenuItem("Items"));
+	
+	Menu mainMenu = new Menu(300, 280, mainMenuItems);
+	mainMenu.x = 20;
+	mainMenu.y = 20;
+	
+	ObservableList<MenuItem> defendMenuItems = new ObservableList<MenuItem>();
+	defendMenuItems.add(new MenuItem("Defend"));
+	
+	Menu defendMenu = new Menu(300, 280, defendMenuItems);
+	defendMenu.x = mainMenu.x + 300;
+	defendMenu.y = mainMenu.y;
+	
+	ObservableList<MenuItem> rowMenuItems = new ObservableList<MenuItem>();
+	rowMenuItems.add(new MenuItem("Change Row"));
+	
+	Menu rowMenu = new Menu(300, 280, rowMenuItems);
+	rowMenu.x = mainMenu.x - 300;
+	rowMenu.y = mainMenu.y;
+	
+	ResourceManager resourceManager = new ResourceManager();
+    CursorFocusManager manager = new CursorFocusManager(stage, resourceManager);
+    	
+	StateMachine fsm = new StateMachine();
+	fsm.addState("main", 
+			enter: ()
+			{
+				stage.addChild(mainMenu);
+				manager.targets.clear();
+				mainMenu.hitAreas.forEach((DisplayObject item)
+        		{
+        			manager.targets.add(item);
+        		});
+				manager.selectedIndex = 0;
+				manager.stream
+        	    .listen((CursorFocusManagerEvent event)
+        	    {
+					print(event.type);
+					print(fsm.currentState.name);
+					switch(event.type)
+					{
+						case CursorFocusManagerEvent.MOVE_RIGHT:
+							if(fsm.currentState.name != 'defense')
+							{
+								fsm.changeState('defense');
+							}
+							break;
+						
+						case CursorFocusManagerEvent.MOVE_LEFT:
+							if(fsm.currentState.name == 'defense')
+							{
+								fsm.changeState('main');
+							}
+							else if(fsm.currentState.name == 'main')
+							{
+								fsm.changeState('row');
+							}
+							break;
+					}
+        	    });
+				manager.hackToTop();
+			}, 
+			exit: ()
+			{
+//				stage.removeChild(mainMenu);
+			});
+	fsm.addState("defense", parent: 'main', 
+			enter: ()
+			{
+				stage.addChild(defendMenu);
+			}, 
+			exit: ()
+			{
+				stage.removeChild(defendMenu);
+			});
+	fsm.addState("row", parent: 'main', 
+			enter: ()
+			{
+				stage.addChild(rowMenu);
+			},
+			exit: ()
+			{
+				stage.removeChild(rowMenu);
+			});
+	
+	
+	resourceManager.load()
+	.then((_)
+	   {
+		fsm.initialState = 'main';
+	 });
+   
+   stage.focus = stage;
+	
 }
 
 void testCursorManager()
 {
 	CanvasElement canvas = querySelector('#stage');
 	canvas.context2D.imageSmoothingEnabled = true;
+	
 	Stage stage = new Stage(canvas, webGL: false);
 	RenderLoop renderLoop = new RenderLoop();
 	renderLoop.addStage(stage);
+	
 	ResourceManager resourceManager = new ResourceManager();
+	resourceManager.addSound("menuBeep", "audio/menu-beep.mp3");
+	
 	GameLoop loop = new GameLoop();
     loop.start();
     
@@ -58,6 +171,17 @@ void testCursorManager()
     stage.addChild(menu);
     menu.x = 20;
     menu.y = 20;
+    
+    SoundManager soundManager = new SoundManager(resourceManager);
+    
+    /*
+     * 1. ObservableList<MenuItem>
+     * 2. Menu
+     * 
+     * 
+     * 
+     * */
+    
     
     CursorFocusManager manager = new CursorFocusManager(stage, resourceManager);
     resourceManager.load()
@@ -78,6 +202,17 @@ void testCursorManager()
 		 {
 	 		print("selected " + menuItems[manager.selectedIndex].name);
 		 });
+         
+         manager.stream
+         .where((CursorFocusManagerEvent event)
+	    {
+        	 return event.type == CursorFocusManagerEvent.INDEX_CHANGED;
+	    })
+        .listen((CursorFocusManagerEvent event)
+		 {
+	 		print("selected " + menuItems[manager.selectedIndex].name);
+	 		soundManager.play("menuBeep");
+		 });
     });
     
     stage.focus = stage;
@@ -94,7 +229,7 @@ void testMenu()
 	
 	Shape fadeShapeScreen = new Shape();
     fadeShapeScreen.graphics.rect(0, 0, 480, 420);
-    fadeShapeScreen.graphics.fillColor(Color.Black);
+    fadeShapeScreen.graphics.fillColor(Color.Green);
     stage.addChild(fadeShapeScreen);
 //   
 //	Shape border = new Shape();
