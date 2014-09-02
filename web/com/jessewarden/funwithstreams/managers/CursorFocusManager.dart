@@ -14,6 +14,7 @@ class CursorFocusManager
 		init();
 	}
 	
+	// TODO/FIXME: Really dude? You're an ex-Flash Developer, come ON mahn.....
 	void hackToTop()
 	{
 		_stage.setChildIndex(_cursorBitmap, _stage.numChildren - 1);
@@ -74,6 +75,17 @@ class CursorFocusManager
                     break;
         	}
     	});
+	}
+	
+	void setTargets(List newTargets)
+	{
+		targets.clear();
+		newTargets.forEach((DisplayObject item)
+		{
+			targets.add(item);
+		});
+		selectedIndex = 0;
+		hackToTop();
 	}
 	
 	

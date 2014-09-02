@@ -61,75 +61,77 @@ void testBattleMenu()
 	defendMenuItems.add(new MenuItem("Defend"));
 	
 	Menu defendMenu = new Menu(300, 280, defendMenuItems);
-	defendMenu.x = mainMenu.x + 300;
+	defendMenu.x = mainMenu.x + 30;
 	defendMenu.y = mainMenu.y;
 	
 	ObservableList<MenuItem> rowMenuItems = new ObservableList<MenuItem>();
 	rowMenuItems.add(new MenuItem("Change Row"));
 	
 	Menu rowMenu = new Menu(300, 280, rowMenuItems);
-	rowMenu.x = mainMenu.x - 300;
+	rowMenu.x = mainMenu.x - 30;
 	rowMenu.y = mainMenu.y;
 	
 	ResourceManager resourceManager = new ResourceManager();
     CursorFocusManager manager = new CursorFocusManager(stage, resourceManager);
-    	
-	StateMachine fsm = new StateMachine();
+    StateMachine fsm = new StateMachine();
+    
+    StreamSubscription streamSubscription = manager.stream
+    .listen((CursorFocusManagerEvent event)
+    {
+		print(event.type);
+		print(fsm.currentState.name);
+		switch(event.type)
+		{
+			case CursorFocusManagerEvent.MOVE_RIGHT:
+				if(fsm.currentState.name == 'main')
+				{
+					fsm.changeState('defense');
+				}
+				else if(fsm.currentState.name == 'row')
+				{
+					fsm.changeState('main');
+				}
+				break;
+			
+			case CursorFocusManagerEvent.MOVE_LEFT:
+				if(fsm.currentState.name == 'defense')
+				{
+					fsm.changeState('main');
+				}
+				else if(fsm.currentState.name == 'main')
+				{
+					fsm.changeState('row');
+				}
+				break;
+		}
+    });
+    
+	
 	fsm.addState("main", 
 			enter: ()
 			{
 				stage.addChild(mainMenu);
-				manager.targets.clear();
-				mainMenu.hitAreas.forEach((DisplayObject item)
-        		{
-        			manager.targets.add(item);
-        		});
-				manager.selectedIndex = 0;
-				manager.stream
-        	    .listen((CursorFocusManagerEvent event)
-        	    {
-					print(event.type);
-					print(fsm.currentState.name);
-					switch(event.type)
-					{
-						case CursorFocusManagerEvent.MOVE_RIGHT:
-							if(fsm.currentState.name != 'defense')
-							{
-								fsm.changeState('defense');
-							}
-							break;
-						
-						case CursorFocusManagerEvent.MOVE_LEFT:
-							if(fsm.currentState.name == 'defense')
-							{
-								fsm.changeState('main');
-							}
-							else if(fsm.currentState.name == 'main')
-							{
-								fsm.changeState('row');
-							}
-							break;
-					}
-        	    });
-				manager.hackToTop();
+				manager.setTargets(mainMenu.hitAreas);
 			}, 
 			exit: ()
 			{
 //				stage.removeChild(mainMenu);
 			});
-	fsm.addState("defense", parent: 'main', 
+	fsm.addState("defense", from: ["main"],
 			enter: ()
 			{
 				stage.addChild(defendMenu);
+				manager.setTargets(defendMenu.hitAreas);
 			}, 
 			exit: ()
 			{
 				stage.removeChild(defendMenu);
 			});
-	fsm.addState("row", parent: 'main', 
+	fsm.addState("row", from: ["main"],
 			enter: ()
 			{
 				stage.addChild(rowMenu);
+				manager.setTargets(rowMenu.hitAreas);
 			},
 			exit: ()
 			{
