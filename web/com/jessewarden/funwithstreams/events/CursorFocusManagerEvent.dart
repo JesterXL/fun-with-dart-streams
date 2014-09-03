@@ -8,6 +8,7 @@ class CursorFocusManagerEvent
 	static const String MOVE_LEFT = "moveLeft";
 	
 	String type;
+	String selectedItem;
 	
 	CursorFocusManagerEvent(this.type)
 	{

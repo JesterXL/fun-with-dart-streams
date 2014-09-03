@@ -103,9 +103,36 @@ void testBattleMenu()
 					fsm.changeState('row');
 				}
 				break;
+				
+			case CursorFocusManagerEvent.SELECTED:
+				String selectedItem;
+				switch(fsm.currentState.name)
+				{
+					case "main":
+						selectedItem = mainMenuItems[manager.selectedIndex].name;
+						break;
+					
+					case "defense":
+						selectedItem = defendMenuItems[manager.selectedIndex].name;
+						break;
+					
+					case "row":
+						selectedItem = rowMenuItems[manager.selectedIndex].name;
+						break;
+				}
+				fsm.changeState('hide');
+				break;
 		}
     });
     
+    fsm.addState('hide', 
+    		enter: ()
+    		{
+    			mainMenu.removeFromParent();
+    			defendMenu.removeFromParent();
+    			rowMenu.removeFromParent();
+    			manager.clearAllTargets();
+    		});
 	
 	fsm.addState("main", 
 			enter: ()

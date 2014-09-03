@@ -88,6 +88,12 @@ class CursorFocusManager
 		hackToTop();
 	}
 	
+	void clearAllTargets()
+	{
+		targets.clear();
+		_setCursorVisible(false);
+	}
+	
 	
 	ObservableList<DisplayObject> targets = new ObservableList<DisplayObject>();
 	
