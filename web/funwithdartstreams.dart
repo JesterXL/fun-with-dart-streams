@@ -4,7 +4,6 @@ import 'dart:html';
 import 'com/jessewarden/funwithstreams/funwithstreamslib.dart';
 import 'package:observe/observe.dart';
 import 'package:stagexl/stagexl.dart';
-import 'package:jxlstatemachine/jxlstatemachine.dart';
 import 'TestingCharacterList.dart';
 
 void main()
@@ -32,12 +31,12 @@ void main()
 	
 //	testInitiative();
 //	testingLockeSprite();
-//	testCharacterList();
 //	testCursorManager();
 	
 //	testMenu();
 	
-	testBattleMenu();
+//	testBattleMenu();
+	testCharacterList();
 }
 
 void testBattleMenu()
@@ -49,130 +48,19 @@ void testBattleMenu()
 	RenderLoop renderLoop = new RenderLoop();
 	renderLoop.addStage(stage);
 	
-	ObservableList<MenuItem> mainMenuItems = new ObservableList<MenuItem>();
-	mainMenuItems.add(new MenuItem("Attack"));
-	mainMenuItems.add(new MenuItem("Items"));
-	
-	Menu mainMenu = new Menu(300, 280, mainMenuItems);
-	mainMenu.x = 20;
-	mainMenu.y = 20;
-	
-	ObservableList<MenuItem> defendMenuItems = new ObservableList<MenuItem>();
-	defendMenuItems.add(new MenuItem("Defend"));
-	
-	Menu defendMenu = new Menu(300, 280, defendMenuItems);
-	defendMenu.x = mainMenu.x + 30;
-	defendMenu.y = mainMenu.y;
-	
-	ObservableList<MenuItem> rowMenuItems = new ObservableList<MenuItem>();
-	rowMenuItems.add(new MenuItem("Change Row"));
-	
-	Menu rowMenu = new Menu(300, 280, rowMenuItems);
-	rowMenu.x = mainMenu.x - 30;
-	rowMenu.y = mainMenu.y;
-	
 	ResourceManager resourceManager = new ResourceManager();
-    CursorFocusManager manager = new CursorFocusManager(stage, resourceManager);
-    StateMachine fsm = new StateMachine();
+	resourceManager.addSound("menuBeep", "audio/menu-beep.mp3");
+	CursorFocusManager cursorManager = new CursorFocusManager(stage, resourceManager);
+	
+	GameLoop loop = new GameLoop();
+    loop.start();
     
-    StreamSubscription streamSubscription = manager.stream
-    .listen((CursorFocusManagerEvent event)
-    {
-		print(event.type);
-		print(fsm.currentState.name);
-		switch(event.type)
-		{
-			case CursorFocusManagerEvent.MOVE_RIGHT:
-				if(fsm.currentState.name == 'main')
-				{
-					fsm.changeState('defense');
-				}
-				else if(fsm.currentState.name == 'row')
-				{
-					fsm.changeState('main');
-				}
-				break;
-			
-			case CursorFocusManagerEvent.MOVE_LEFT:
-				if(fsm.currentState.name == 'defense')
-				{
-					fsm.changeState('main');
-				}
-				else if(fsm.currentState.name == 'main')
-				{
-					fsm.changeState('row');
-				}
-				break;
-				
-			case CursorFocusManagerEvent.SELECTED:
-				String selectedItem;
-				switch(fsm.currentState.name)
-				{
-					case "main":
-						selectedItem = mainMenuItems[manager.selectedIndex].name;
-						break;
-					
-					case "defense":
-						selectedItem = defendMenuItems[manager.selectedIndex].name;
-						break;
-					
-					case "row":
-						selectedItem = rowMenuItems[manager.selectedIndex].name;
-						break;
-				}
-				fsm.changeState('hide');
-				break;
-		}
-    });
-    
-    fsm.addState('hide', 
-    		enter: ()
-    		{
-    			mainMenu.removeFromParent();
-    			defendMenu.removeFromParent();
-    			rowMenu.removeFromParent();
-    			manager.clearAllTargets();
-    		});
-	
-	fsm.addState("main", 
-			enter: ()
-			{
-				stage.addChild(mainMenu);
-				manager.setTargets(mainMenu.hitAreas);
-			}, 
-			exit: ()
-			{
-//				stage.removeChild(mainMenu);
-			});
-	fsm.addState("defense", from: ["main"],
-			enter: ()
-			{
-				stage.addChild(defendMenu);
-				manager.setTargets(defendMenu.hitAreas);
-			}, 
-			exit: ()
-			{
-				stage.removeChild(defendMenu);
-			});
-	fsm.addState("row", from: ["main"],
-			enter: ()
-			{
-				stage.addChild(rowMenu);
-				manager.setTargets(rowMenu.hitAreas);
-			},
-			exit: ()
-			{
-				stage.removeChild(rowMenu);
-			});
-	
-	
+	BattleMenu battleMenu = new BattleMenu(resourceManager, cursorManager, stage);
 	resourceManager.load()
 	.then((_)
-	   {
-		fsm.initialState = 'main';
-	 });
-   
-   stage.focus = stage;
+	{
+		battleMenu.show();
+	});
 	
 }
 
@@ -295,10 +183,9 @@ void testMenu()
 	});
 	
 }
-
 void testCharacterList()
 {
-	new TestingCharacterList();
+	new TestingCharacterList().init();
 }
 
 

@@ -9,7 +9,7 @@ class LockeSprite extends SpriteSheet
 		this.resourceManager = resourceManager;
 		if(resourceManager.containsTextureAtlas('locke') == false)
 		{
-			resourceManager.addTextureAtlas('locke', '../design/spritesheets/texturepacker/locke.json', TextureAtlasFormat.JSONARRAY);
+			resourceManager.addTextureAtlas('locke', 'design/spritesheets/texturepacker/locke.json', TextureAtlasFormat.JSONARRAY);
 		}
 		
         getAnimationList("idleSouth")

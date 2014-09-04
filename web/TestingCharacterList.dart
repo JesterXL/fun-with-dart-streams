@@ -84,11 +84,11 @@ class TestingCharacterList
 	    fadeShapeScreen.graphics.fillColor(Color.Black);
 	    stage.addChild(fadeShapeScreen);
 	    
-	    resourceManager.addBitmapData("battleTintTop", "../design/battle-tint-top.png");
-	    resourceManager.addBitmapData("battleTintBottom", "../design/battle-tint-bottom.png");
+	    resourceManager.addBitmapData("battleTintTop", "design/battle-tint-top.png");
+	    resourceManager.addBitmapData("battleTintBottom", "design/battle-tint-bottom.png");
 	    
-		resourceManager.addSound("battleTheme", "../audio/battle-theme.mp3");
-		resourceManager.addSound("encounter", "../audio/encounter.mp3");
+		resourceManager.addSound("battleTheme", "audio/battle-theme.mp3");
+		resourceManager.addSound("encounter", "audio/encounter.mp3");
 		SoundTransform soundTransform = new SoundTransform(0.1);
 		Bitmap topTint;
 		Bitmap bottomTint;

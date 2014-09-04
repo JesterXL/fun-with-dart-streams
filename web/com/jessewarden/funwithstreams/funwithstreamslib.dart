@@ -6,6 +6,7 @@ import 'dart:core';
 import 'dart:async';
 import 'package:stagexl/stagexl.dart';
 import 'package:observe/observe.dart';
+import 'package:jxlstatemachine/jxlstatemachine.dart';
 
 part 'streams/GameLoop.dart';
 part 'events/GameLoopEvent.dart';
@@ -31,6 +32,7 @@ part "vos/MenuItem.dart";
 part "components/BattleTimerBar.dart";
 part "components/CharacterList.dart";
 part "components/Menu.dart";
+part "components/BattleMenu.dart";
 
 part "sprites/SpriteSheet.dart";
 part "sprites/LockeSprite.dart";

@@ -14,7 +14,7 @@ class CursorFocusManager
 		init();
 	}
 	
-	// TODO/FIXME: Really dude? You're an ex-Flash Developer, come ON mahn.....
+	// TODO/FIXME: *Spaceballs voice* Really dude? You're an ex-Flash Developer, come ON mahhhn.....
 	void hackToTop()
 	{
 		_stage.setChildIndex(_cursorBitmap, _stage.numChildren - 1);
@@ -50,6 +50,7 @@ class CursorFocusManager
 		
 		_stage.onKeyDown.listen((KeyboardEvent event)
     	{
+			print(event.keyCode);
         	switch(event.keyCode)
         	{
         		case 87: // w
