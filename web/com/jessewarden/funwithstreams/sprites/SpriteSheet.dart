@@ -1,4 +1,4 @@
-part of funwithstreams;
+part of funwithstreamslib;
 
 abstract class SpriteSheet extends DisplayObjectContainer
 {

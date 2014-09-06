@@ -13,7 +13,7 @@ class Initiative
 	ObservableList<Monster> get monsters => _monsters;
 	
 	ObservableList<Character> charactersReady = new ObservableList<Character>();
-	Stream<InitiativeEvent> stream;
+	Stream stream;
 	
     	
 	Initiative(this._gameLoopStream, this._players, this._monsters)
@@ -23,7 +23,7 @@ class Initiative
 	
 	void init()
 	{
-		_streamController = new StreamController<InitiativeEvent>(onPause: onPause, onResume: onResume);
+		_streamController = new StreamController(onPause: onPause, onResume: onResume);
 		stream = _streamController.stream.asBroadcastStream();
 		List participants = new List();
 		participants.add(players);
@@ -47,18 +47,15 @@ class Initiative
 	{
 		String mode = getModeBasedOnType(character);
 		BattleTimer timer = new BattleTimer(_gameLoopStream, mode);
-		StreamSubscription<BattleTimerEvent> timerSubscription = timer.stream.where((BattleTimerEvent event)
-		{
-			return event.type == BattleTimerEvent.COMPLETE;
-		})
+		StreamSubscription<BattleTimerEvent> timerSubscription = timer.stream
 		.listen((BattleTimerEvent event)
 		{
-			try
+			TimerCharacterMap matched = _battleTimers.firstWhere((TimerCharacterMap map)
 			{
-				TimerCharacterMap matched = _battleTimers.firstWhere((TimerCharacterMap map)
-				{
-					return map.battleTimer == event.target;
-				});
+				return map.battleTimer == event.target;
+			});
+			if(event.type == BattleTimerEvent.COMPLETE)
+			{
 				// NOTE: pausing the BattleTimer, not the Stream listener... lol, streams!
 				matched.battleTimer.pause();
 				Character targetCharacter = matched.character;
@@ -66,9 +63,10 @@ class Initiative
 				_streamController.add(new InitiativeEvent(InitiativeEvent.CHARACTER_READY,
 															character: targetCharacter));
 			}
-			catch(listenError)
+			else if(event.type == BattleTimerEvent.PROGRESS)
 			{
-				print("error in listen: $listenError");
+				event.character = matched.character;
+				_streamController.add(event);
 			}
 		});
 		timer.speed = character.speed;

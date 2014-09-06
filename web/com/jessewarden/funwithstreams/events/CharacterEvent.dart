@@ -11,6 +11,7 @@ class CharacterEvent
 	Character target;
 	String oldBattleState;
 	String newBattleState;
+	int changeAmount;
 	
 	CharacterEvent({String this.type, 
 					Character this.target,

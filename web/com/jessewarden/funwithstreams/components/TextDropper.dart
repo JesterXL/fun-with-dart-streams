@@ -1,4 +1,4 @@
-part of funwithdartstreams;
+part of funwithstreamslib;
 
 class TextDropper
 {

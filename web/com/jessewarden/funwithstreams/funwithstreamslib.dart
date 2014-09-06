@@ -28,12 +28,14 @@ part "streams/Initiative.dart";
 part "events/InitiativeEvent.dart";
 part "vos/TargetHitResult.dart";
 part "vos/MenuItem.dart";
+part "TestCharacterAndMonsterList.dart";
 
 part "components/BattleTimerBar.dart";
 part "components/CharacterList.dart";
 part "components/Menu.dart";
 part "components/BattleMenu.dart";
 part "components/TextDropper.dart";
+part "components/MonsterList.dart";
 
 part "sprites/SpriteSheet.dart";
 part "sprites/LockeSprite.dart";

@@ -10,6 +10,7 @@ class InitiativeEvent
 	
 	String type;
 	Character character;
+	num percentage;
 	
 	InitiativeEvent(this.type, {Character character: null})
 	{

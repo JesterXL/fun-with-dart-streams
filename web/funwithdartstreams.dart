@@ -56,7 +56,14 @@ void main()
 //	testBattleMenu();
 //	testCharacterList();
 	
-	testTextUp();
+//	testTextUp();
+	
+	testCharacterAndMonsterList();
+}
+
+void testCharacterAndMonsterList()
+{
+	new TestCharacterAndMonsterList(stage, renderLoop, resourceManager, cursorManager);
 }
 
 void testTextUp()

@@ -34,6 +34,7 @@ class CursorFocusManager
 		{
 			_cursorBitmap = new Bitmap(_resourceManager.getBitmapData('cursor'));
 			_stage.addChild(_cursorBitmap);
+			_cursorBitmap.visible = false;
 		});
 		
 		targets.listChanges.listen((List<ListChangeRecord> changes)

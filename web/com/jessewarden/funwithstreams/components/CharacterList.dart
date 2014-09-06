@@ -5,15 +5,23 @@ class CharacterList extends DisplayObjectContainer
 	
 	Initiative initiative;
 	ResourceManager resourceManager;
+	Stage stage;
+	RenderLoop renderLoop;
 	
-	CharacterList(this.initiative, this.resourceManager)
+	TextDropper _textDropper;
+	
+	CharacterList({Initiative this.initiative,
+					ResourceManager this.resourceManager,
+					Stage this.stage,
+					RenderLoop this.renderLoop})
 	{
 		init();
 	}
 	
 	void init()
 	{
-        
+		_textDropper = new TextDropper(stage, renderLoop);  
+		
 		num startXBar = 392;
 		num startYBar = 316;
 		
@@ -61,18 +69,19 @@ class CharacterList extends DisplayObjectContainer
 	    	bar.y = startYBar;
 	    	startYBar += 24;
 	    	
-	    	BattleTimer timer = new BattleTimer(initiative.gameLoopStream, BattleTimer.MODE_CHARACTER);
-        	timer.start();
-        	timer.stream
-        	.where((BattleTimerEvent event)
-        	{
-        		return event.type == BattleTimerEvent.PROGRESS;
-        	})
-        	.listen((BattleTimerEvent event)
-        	{
-        		bar.percentage = event.percentage;
-        	});
-        	
+	    	initiative.stream
+	    	.where((event)
+			{
+	    		return event is BattleTimerEvent &&
+	    				event.type == BattleTimerEvent.PROGRESS &&
+	    				event.character == player;
+			})
+	    	.listen((event)
+			{
+	    	
+	    		BattleTimerEvent battleTimerEvent = event as BattleTimerEvent;
+				bar.percentage = battleTimerEvent.percentage;
+			});
         	
         	// create sprite
         	SpriteSheet sheet = getSpriteSheetForPlayerCharacterType(player);
@@ -88,6 +97,16 @@ class CharacterList extends DisplayObjectContainer
 				if(event.type == CharacterEvent.HIT_POINTS_CHANGED)
 				{
 					hitPointsField.text = event.target.hitPoints.toString();
+					int color;
+					if(event.changeAmount < 0)
+					{
+						color = Color.White;
+					}
+					else
+					{
+						color = Color.Green;
+					}
+					_textDropper.addTextDrop(sheet, event.changeAmount, color: color);
 				}
 			});
 		});
