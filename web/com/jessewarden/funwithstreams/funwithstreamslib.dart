@@ -33,11 +33,11 @@ part "components/BattleTimerBar.dart";
 part "components/CharacterList.dart";
 part "components/Menu.dart";
 part "components/BattleMenu.dart";
+part "components/TextDropper.dart";
 
 part "sprites/SpriteSheet.dart";
 part "sprites/LockeSprite.dart";
 
-part "managers/CursorTarget.dart";
 part "managers/CursorFocusManager.dart";
 part "events/CursorFocusManagerEvent.dart";
 part "managers/SoundManager.dart";

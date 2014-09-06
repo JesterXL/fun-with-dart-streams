@@ -91,11 +91,6 @@ class CharacterList extends DisplayObjectContainer
 				}
 			});
 		});
-		
-		initiative.stream.where((InitiativeEvent event)
-		{
-	
-		});
 	}
 	
 	SpriteSheet getSpriteSheetForPlayerCharacterType(Player player)

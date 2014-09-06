@@ -1,14 +1,32 @@
 import 'dart:core';
 import 'dart:async';
 import 'dart:html';
+import 'dart:math';
 import 'com/jessewarden/funwithstreams/funwithstreamslib.dart';
 import 'package:observe/observe.dart';
 import 'package:stagexl/stagexl.dart';
 import 'TestingCharacterList.dart';
 
+CanvasElement canvas;
+Stage stage;
+RenderLoop renderLoop;
+ResourceManager resourceManager;
+CursorFocusManager cursorManager;
+
 void main()
 {
 	print("main");
+	
+	canvas = querySelector('#stage');
+	canvas.context2D.imageSmoothingEnabled = true;
+	
+	stage = new Stage(canvas, webGL: false);
+	renderLoop = new RenderLoop();
+	renderLoop.addStage(stage);
+	
+	resourceManager = new ResourceManager();
+	cursorManager = new CursorFocusManager(stage, resourceManager);
+	
 //	testGameLoop();
 //	testBattleUtilsGetRandomNumber();
 //	testGameLoopPauseResume();
@@ -36,19 +54,47 @@ void main()
 //	testMenu();
 	
 //	testBattleMenu();
-	testCharacterList();
+//	testCharacterList();
+	
+	testTextUp();
+}
+
+void testTextUp()
+{
+	Shape spot1 = new Shape();
+	spot1.graphics.rectRound(0, 0, 40, 40, 6, 6);
+	spot1.graphics.fillColor(Color.Blue);
+	spot1.graphics.strokeColor(Color.White, 4);
+	spot1.alpha = 0.4;
+	stage.addChild(spot1);
+	spot1.x = 40;
+	spot1.y = 40;
+	
+	Shape spot2 = new Shape();
+	spot2.graphics.rectRound(0, 0, 40, 40, 6, 6);
+	spot2.graphics.fillColor(Color.Blue);
+	spot2.graphics.strokeColor(Color.White, 4);
+	spot2.alpha = 0.4;
+	stage.addChild(spot2);
+	spot2.x = 200;
+	spot2.y = 200;
+	
+	TextDropper textDropper = new TextDropper(stage, renderLoop);
+	
+	new Stream.periodic(new Duration(seconds: 1), (_)
+	{
+		print("boom");
+		return new Random().nextInt(9999);
+	})
+	.listen((int value)
+	{
+		print("chaka");
+		textDropper.addTextDrop(spot1, value);
+	});
 }
 
 void testBattleMenu()
 {
-	CanvasElement canvas = querySelector('#stage');
-	canvas.context2D.imageSmoothingEnabled = true;
-	
-	Stage stage = new Stage(canvas, webGL: false);
-	RenderLoop renderLoop = new RenderLoop();
-	renderLoop.addStage(stage);
-	
-	ResourceManager resourceManager = new ResourceManager();
 	resourceManager.addSound("menuBeep", "audio/menu-beep.mp3");
 	CursorFocusManager cursorManager = new CursorFocusManager(stage, resourceManager);
 	

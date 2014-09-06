@@ -72,7 +72,7 @@ class TestingCharacterList
 		})
 		.listen((InitiativeEvent event)
 		{
-			
+			print("character ready: $event");
 		});
 		
 		ResourceManager resourceManager = new ResourceManager();
