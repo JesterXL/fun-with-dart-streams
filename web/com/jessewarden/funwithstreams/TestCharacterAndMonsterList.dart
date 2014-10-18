@@ -20,7 +20,7 @@ class TestCharacterAndMonsterList
 		border.graphics.strokeColor(Color.Black);
 		stage.addChild(border);
 		
-	    GameLoop loop = new GameLoop();
+		GameLoop loop = new GameLoop();
 		loop.start();
 		
 		ObservableList<Player> players = new ObservableList<Player>();
@@ -41,7 +41,7 @@ class TestCharacterAndMonsterList
 		})
 		.listen((event)
 		{
-			print("character ready: $event");
+			print("character ready: ${event.character}");
 		});
 		
 		CharacterList characterList = new CharacterList(initiative: initiative, 
@@ -69,7 +69,7 @@ class TestCharacterAndMonsterList
 		resourceManager.addSound("battleTheme", "audio/battle-theme.mp3");
 		resourceManager.addSound("encounter", "audio/encounter.mp3");
 		
-		SoundTransform soundTransform = new SoundTransform(0.1);
+		SoundTransform soundTransform = new SoundTransform(1);
 		Bitmap topTint;
 		Bitmap bottomTint;
 		resourceManager.load()

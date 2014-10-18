@@ -6,7 +6,7 @@ class BattleController
 	Map _battleResults = new Map();
 	bool _battleOver = false;
 	StreamController<BattleControllerEvent> _streamController;
-    Stream<BattleControllerEvent> battleStream;
+    Stream<BattleControllerEvent> stream;
 	
 	static const String INITIALIZED = "initialized";
 	static const String CHARACTER_READY = "characterReady";
@@ -16,12 +16,25 @@ class BattleController
 	
 	BattleController(Initiative this._initiative)
 	{
-		_initiative.stream.listen((InitiativeEvent event)
+		_initiative.stream
+		.where((event)
+		{
+			return event is InitiativeEvent;
+		})
+		.listen((event)
 		{
 			switch(event.type)
 			{
 				case InitiativeEvent.CHARACTER_READY:
-					_charactersReady.add(event.character);
+					if(event.character is Monster)
+					{
+						List players = _initiative.players.toList();
+						Random randomInt = new Random().nextInt(_initiative.players.length - 1);
+						List shuffledPlayers = players.shuffle(randomInt);
+						Character randomTarget = shuffledPlayers[0];
+						attack(event.character, [randomTarget], AttackTypes.ATTACK);
+					}
+					break;
 			}
 		});
 	}
@@ -36,11 +49,6 @@ class BattleController
 		assert(attacker != null);
 		assert(targets != null);
 		assert(targets.length > 0);
-		
-		if(_charactersReady.contains(attacker) == false)
-		{
-			throw "BattleController::attack, unknown attacker, he's not in our ready list.";
-		}
 		
 		List<TargetHitResult> targetHitResults = new List<TargetHitResult>();
 		targets.forEach((Character target)
